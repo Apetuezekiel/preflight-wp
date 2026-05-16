@@ -1,4 +1,4 @@
-# PreFlight — Product Brief v1.1
+# PreFlight — Product Brief v1.2
 
 **Plugin Name:** PreFlight
 **WordPress.org Slug (target):** `preflight-wp`
@@ -11,6 +11,7 @@
 **Revision history:**
 - v1.0 — initial draft
 - v1.1 — structural corrections: severity model formalized, theatrical checks removed or deferred, scope contradiction resolved, failure-handling mechanism specified, accessibility and i18n constraints added, audit-artifact framing corrected, success metrics re-anchored
+- v1.2 — §13.3 amendment: `feature/failure-handling` collapsed into `feature/scanner-core`. The failure contract (try/catch wrap, shutdown handler, raised limits) is part of the scanner's interface guarantee, not a separable feature
 
 ---
 
@@ -550,8 +551,7 @@ WordPress.org plugin review includes examining development history. A clean, pro
 ```
 main                          ← always stable, tagged releases only
 ├── develop                   ← integration branch
-│   ├── feature/scanner-core
-│   ├── feature/failure-handling      ← try/catch + shutdown function (Section 5.2)
+│   ├── feature/scanner-core              ← scan orchestrator + failure handling (Brief §5.2)
 │   ├── feature/checks-wp-config
 │   ├── feature/checks-content
 │   ├── feature/checks-security
