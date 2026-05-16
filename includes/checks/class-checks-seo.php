@@ -165,11 +165,37 @@ class PreFlight_Checks_SEO implements PreFlight_Check_Category {
 	/**
 	 * Fail when no XML sitemap generator is active.
 	 *
+	 * Brief §3.2's original wording referenced "WP < 5.5" as the condition for
+	 * checking sitemap generators. At the WP 6.0+ baseline, core sitemaps are
+	 * always available via wp-sitemap.xml unless explicitly disabled. Corrected
+	 * detection logic:
+	 *   1. Pass if any SEO plugin in SEO_PLUGIN_SIGNALS is active — all listed
+	 *      SEO plugins generate sitemaps.
+	 *   2. Else pass if apply_filters('wp_sitemaps_enabled', true) === true —
+	 *      core sitemap generator is not disabled.
+	 *   3. Else fail.
+	 *
+	 * Loopback forbidden (Brief §5.2) — cannot verify the sitemap URL actually
+	 * returns content. HTTP accessibility is deferred to Phase 5.
+	 *
 	 * @since 0.5.0
 	 * @return PreFlight_Check_Result
 	 */
 	public function check_sitemap_generator(): PreFlight_Check_Result {
-		return PreFlight_Check_Result::skip( 'not yet implemented' );
+		// SEO plugin present — all listed plugins generate sitemaps.
+		if ( null !== $this->matches_any_signal( self::SEO_PLUGIN_SIGNALS ) ) {
+			return PreFlight_Check_Result::pass();
+		}
+
+		// Core sitemap generator enabled (default WordPress 5.5+ behaviour).
+		if ( true === apply_filters( 'wp_sitemaps_enabled', true ) ) {
+			return PreFlight_Check_Result::pass();
+		}
+
+		return PreFlight_Check_Result::fail(
+			__( 'No sitemap generator is active. The site is on WordPress 6.0+ but core sitemaps appear to be disabled via the wp_sitemaps_enabled filter, and no SEO plugin that generates sitemaps is detected.', 'preflight-wp' ),
+			__( 'Either remove the filter that disables core sitemaps, or install an SEO plugin that generates sitemaps (Yoast SEO, Rank Math, All in One SEO, or SEOPress).', 'preflight-wp' )
+		);
 	}
 
 	/**
