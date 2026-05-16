@@ -432,10 +432,13 @@ class PreFlight_Checks_WP_Config implements PreFlight_Check_Category {
 	/**
 	 * Check: automatic updates for WordPress core disabled. (Info)
 	 *
-	 * Fires if any of three disable mechanisms are active:
-	 *   - AUTOMATIC_UPDATER_DISABLED constant
-	 *   - WP_AUTO_UPDATE_CORE === false
-	 *   - wp_is_auto_update_enabled_for_type('core') returns false (WP 5.5+)
+	 * Evaluation order (Brief v1.5 §3.2, §5.2):
+	 *   1. AUTOMATIC_UPDATER_DISABLED constant — unconditional.
+	 *   2. WP_AUTO_UPDATE_CORE === false constant — unconditional.
+	 *   3. wp_is_auto_update_enabled_for_type('core') — guarded by update_core transient.
+	 *      The function reads the transient internally; when the transient transitions
+	 *      from absent to populated between two scans, it returns different values for
+	 *      identical site state, violating §5.2 idempotency. Guard: skip if transient absent.
 	 *
 	 * @return PreFlight_Check_Result
 	 */
@@ -448,8 +451,24 @@ class PreFlight_Checks_WP_Config implements PreFlight_Check_Category {
 			return $this->auto_updates_fail();
 		}
 
-		if ( function_exists( 'wp_is_auto_update_enabled_for_type' ) && ! wp_is_auto_update_enabled_for_type( 'core' ) ) {
-			return $this->auto_updates_fail();
+		// Brief §5.2 idempotency guard (v1.5): wp_is_auto_update_enabled_for_type() reads
+		// the update_core transient internally. Skip filter-based detection when the transient
+		// is absent to prevent the check flipping between consecutive scans as WordPress
+		// populates the transient during its background update check.
+		// The function lives in wp-admin/includes/update.php (admin-only file); require
+		// explicitly so it is available in non-browser contexts (WP-CLI, test scripts).
+		require_once ABSPATH . 'wp-admin/includes/update.php';
+		if ( function_exists( 'wp_is_auto_update_enabled_for_type' ) ) {
+			$transient = get_site_transient( 'update_core' );
+			if ( false === $transient || ! isset( $transient->updates ) ) {
+				return PreFlight_Check_Result::skip(
+					__( 'Cannot evaluate auto-update filters without the update_core transient. Visit Dashboard → Updates to trigger WordPress\'s update check, then re-run the scan.', 'preflight-wp' )
+				);
+			}
+
+			if ( ! wp_is_auto_update_enabled_for_type( 'core' ) ) {
+				return $this->auto_updates_fail();
+			}
 		}
 
 		return PreFlight_Check_Result::pass();
