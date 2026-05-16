@@ -155,13 +155,15 @@ class PreFlight_Checks_Plugins implements PreFlight_Check_Category {
 		require_once ABSPATH . 'wp-admin/includes/plugin.php';
 		require_once ABSPATH . 'wp-admin/includes/update.php';
 
-		$updates = get_plugin_updates();
-
-		if ( false === $updates ) {
+		// get_plugin_updates() always returns an array; check the raw transient
+		// to distinguish "background check not run yet" from "no updates."
+		if ( false === get_site_transient( 'update_plugins' ) ) {
 			return PreFlight_Check_Result::skip(
 				__( 'Plugin update data is not available — the background update check has not run yet.', 'preflight-wp' )
 			);
 		}
+
+		$updates = get_plugin_updates();
 
 		if ( empty( $updates ) ) {
 			return PreFlight_Check_Result::pass();
