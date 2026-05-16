@@ -35,6 +35,13 @@ wp-config.php
 # htaccess
 /.htaccess
 
+# Editor and OS artifacts
+.vscode/
+.idea/
+*.swp
+.DS_Store
+node_modules/
+
 # All plugins
 #
 # Note: If you wish to whitelist plugins,
