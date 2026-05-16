@@ -71,6 +71,8 @@ class PreFlight_Scanner {
 		self::$scan_in_progress = true;
 		self::$partial_results  = array();
 
+		$this->register_fatal_handler( $scan_start );
+
 		$results = array();
 
 		foreach ( $this->core->get_categories() as $category ) {
@@ -93,6 +95,7 @@ class PreFlight_Scanner {
 		}
 
 		$this->clear_scan_flag();
+		self::$partial_results = array(); // Free memory; clean scan needs no partial state.
 
 		return array(
 			'timestamp'   => gmdate( 'c' ),
@@ -173,6 +176,78 @@ class PreFlight_Scanner {
 	// -------------------------------------------------------------------------
 	// Private helpers
 	// -------------------------------------------------------------------------
+
+	/**
+	 * Register a shutdown function that persists partial results on fatal error.
+	 *
+	 * The transient key encodes the scan start timestamp to avoid collisions if
+	 * two scans somehow overlap (e.g., two admin users triggering a scan at the
+	 * same second — unlikely but possible).
+	 *
+	 * Manual verification path for the fatal handler:
+	 *   Register a stub check whose get_check() (not run()) causes a fatal — e.g.
+	 *   a category class that calls an undefined static method on itself inside
+	 *   get_check(). Because get_check() is called *outside* the run_single_check
+	 *   try/catch, a fatal there bypasses the per-check guard and reaches this
+	 *   handler. After the fatal, get_transient('preflight_partial_scan_<ts>')
+	 *   should return the results collected before the bad check was reached.
+	 *   Note: \Throwable in run() *is* caught per-check, so only code between
+	 *   the try/catch blocks (i.e. category->get_check()) triggers this path.
+	 *
+	 * @since  0.2.0
+	 * @param  int $scan_start_ts Unix timestamp captured at scan start.
+	 */
+	private function register_fatal_handler( int $scan_start_ts ): void {
+		register_shutdown_function(
+			function () use ( $scan_start_ts ) {
+				$this->handle_fatal( $scan_start_ts );
+			}
+		);
+	}
+
+	/**
+	 * Shutdown callback: write partial results transient if a fatal ended the scan.
+	 *
+	 * Acts only when both conditions are true:
+	 *   1. self::$scan_in_progress === true (scan did not exit cleanly).
+	 *   2. error_get_last() reports a fatal-class error type.
+	 *
+	 * Fatal types checked: E_ERROR | E_PARSE | E_COMPILE_ERROR | E_USER_ERROR |
+	 * E_CORE_ERROR. Does not call exit() — WordPress may have additional shutdown
+	 * handlers that must still run.
+	 *
+	 * Transient TTL: HOUR_IN_SECONDS (1 hour). The admin UI checks for this
+	 * transient on page load and surfaces a partial-results notice (§5.2).
+	 *
+	 * @since  0.2.0
+	 * @param  int $scan_start_ts
+	 */
+	private function handle_fatal( int $scan_start_ts ): void {
+		if ( ! self::$scan_in_progress ) {
+			return;
+		}
+
+		$error = error_get_last();
+		if ( null === $error ) {
+			return;
+		}
+
+		$fatal_mask = E_ERROR | E_PARSE | E_COMPILE_ERROR | E_USER_ERROR | E_CORE_ERROR;
+		if ( ! ( $error['type'] & $fatal_mask ) ) {
+			return;
+		}
+
+		set_transient(
+			'preflight_partial_scan_' . $scan_start_ts,
+			array(
+				'partial' => true,
+				'fatal'   => $error,
+				'results' => self::$partial_results,
+				'summary' => $this->compute_summary( self::$partial_results ),
+			),
+			HOUR_IN_SECONDS
+		);
+	}
 
 	/**
 	 * Count result rows into the summary buckets defined by Brief §5.3.
