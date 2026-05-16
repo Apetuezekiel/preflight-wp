@@ -201,21 +201,46 @@ class PreFlight_Checks_SEO implements PreFlight_Check_Category {
 	/**
 	 * Fail when no recognised SEO plugin is active.
 	 *
+	 * Iterates SEO_PLUGIN_SIGNALS; passes on the first match. The fail message
+	 * names the plugins PreFlight can detect so the developer knows the coverage.
+	 *
 	 * @since 0.5.0
 	 * @return PreFlight_Check_Result
 	 */
 	public function check_seo_plugin(): PreFlight_Check_Result {
-		return PreFlight_Check_Result::skip( 'not yet implemented' );
+		if ( null !== $this->matches_any_signal( self::SEO_PLUGIN_SIGNALS ) ) {
+			return PreFlight_Check_Result::pass();
+		}
+
+		return PreFlight_Check_Result::fail(
+			__( 'No recognized SEO plugin is active. PreFlight detects: Yoast SEO, Rank Math, All in One SEO, SEOPress, The SEO Framework, Slim SEO, Squirrly.', 'preflight-wp' ),
+			__( 'Not every site needs a dedicated SEO plugin — small content sites, or sites where SEO is handled at the theme or hosting level, may legitimately not have one. If this site relies on default WP metadata, this check can be suppressed.', 'preflight-wp' )
+		);
 	}
 
 	/**
 	 * Fail when no plugin that generates Open Graph tags is detected.
 	 *
+	 * Passes if any SEO plugin in SEO_PLUGIN_SIGNALS is active (all listed SEO
+	 * plugins handle Open Graph by default) OR any OG_DEDICATED_PLUGIN_SIGNALS
+	 * signal resolves.
+	 *
 	 * @since 0.5.0
 	 * @return PreFlight_Check_Result
 	 */
 	public function check_og_plugin(): PreFlight_Check_Result {
-		return PreFlight_Check_Result::skip( 'not yet implemented' );
+		if ( null !== $this->matches_any_signal( self::SEO_PLUGIN_SIGNALS ) ) {
+			return PreFlight_Check_Result::pass();
+		}
+
+		if ( null !== $this->matches_any_signal( self::OG_DEDICATED_PLUGIN_SIGNALS ) ) {
+			return PreFlight_Check_Result::pass();
+		}
+
+		return PreFlight_Check_Result::fail(
+			__( 'No plugin that generates Open Graph tags is detected. Social media link previews will use whatever the theme outputs by default, which is often limited or absent.', 'preflight-wp' ),
+			__( 'Activate an SEO plugin (Yoast SEO, Rank Math, All in One SEO, SEOPress) or a dedicated Open Graph plugin. Verify the social previews via the official Facebook Sharing Debugger and Twitter Card Validator after launch.', 'preflight-wp' )
+		);
 	}
 
 	// -------------------------------------------------------------------------
