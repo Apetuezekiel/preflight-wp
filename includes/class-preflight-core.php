@@ -17,6 +17,9 @@ class PreFlight_Core {
 	/** @var PreFlight_Check_Category[] Keyed by category ID. */
 	private $categories = array();
 
+	/** @var PreFlight_Scanner|null Instantiated on first call to get_scanner(). */
+	private $scanner = null;
+
 	private function __construct() {}
 
 	public static function instance(): self {
@@ -34,7 +37,23 @@ class PreFlight_Core {
 	 * in this file — adding a new category requires no modification here (§11).
 	 */
 	public function boot(): void {
+		require_once PREFLIGHT_PATH . 'includes/class-preflight-scanner.php';
 		do_action( 'preflight_register_categories', $this );
+	}
+
+	/**
+	 * Return the scanner instance, creating it on first call.
+	 *
+	 * Lazy instantiation per §5.5 — the scanner is not constructed during boot()
+	 * or on every admin page load. It is created only when a scan is about to run.
+	 *
+	 * @return PreFlight_Scanner
+	 */
+	public function get_scanner(): PreFlight_Scanner {
+		if ( null === $this->scanner ) {
+			$this->scanner = new PreFlight_Scanner( $this );
+		}
+		return $this->scanner;
 	}
 
 	/**
