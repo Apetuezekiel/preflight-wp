@@ -210,24 +210,110 @@ class PreFlight_Checks_WP_Config implements PreFlight_Check_Category {
 		return PreFlight_Check_Result::pass();
 	}
 
-	/** @return PreFlight_Check_Result */
+	/**
+	 * Check: debug log file exists. (Warning)
+	 *
+	 * Resolves the log path from WP_DEBUG_LOG (string path, true, or undefined)
+	 * and falls back to checking WP_CONTENT_DIR/debug.log regardless of the
+	 * constant — a log file can persist after the constant is removed.
+	 * HTTP accessibility cannot be verified without loopback (Phase 5).
+	 *
+	 * @return PreFlight_Check_Result
+	 */
 	public function check_debug_log_file(): PreFlight_Check_Result {
-		return PreFlight_Check_Result::skip( __( 'Not yet implemented.', 'preflight-wp' ) );
+		$log_path = $this->resolve_debug_log_path();
+
+		if ( null !== $log_path && file_exists( $log_path ) ) {
+			$relative = str_replace( ABSPATH, '', $log_path );
+			return PreFlight_Check_Result::fail(
+				sprintf(
+					/* translators: %s: relative file path */
+					__( 'Debug log file exists at %s. HTTP accessibility cannot be verified without loopback (Phase 5).', 'preflight-wp' ),
+					$relative
+				),
+				__( 'Delete the log file, or move it outside the webroot, or block public access at the server level. Set WP_DEBUG_LOG to false in wp-config.php.', 'preflight-wp' )
+			);
+		}
+
+		return PreFlight_Check_Result::pass();
 	}
 
-	/** @return PreFlight_Check_Result */
+	/**
+	 * Resolve the debug log file path from constants and fallback.
+	 *
+	 * @return string|null Absolute path, or null if no path can be determined.
+	 */
+	private function resolve_debug_log_path(): ?string {
+		if ( defined( 'WP_DEBUG_LOG' ) ) {
+			if ( is_string( WP_DEBUG_LOG ) ) {
+				return WP_DEBUG_LOG;
+			}
+			if ( WP_DEBUG_LOG === true ) {
+				return WP_CONTENT_DIR . '/debug.log';
+			}
+			// WP_DEBUG_LOG === false: still check default location.
+		}
+		return WP_CONTENT_DIR . '/debug.log';
+	}
+
+	/**
+	 * Check: timezone configured as UTC offset only. (Warning)
+	 *
+	 * @return PreFlight_Check_Result
+	 */
 	public function check_timezone(): PreFlight_Check_Result {
-		return PreFlight_Check_Result::skip( __( 'Not yet implemented.', 'preflight-wp' ) );
+		if ( '' === get_option( 'timezone_string' ) ) {
+			return PreFlight_Check_Result::fail(
+				__( 'Timezone is set as a UTC offset only — DST transitions will not be applied automatically.', 'preflight-wp' ),
+				__( 'Settings → General → Timezone — select a named city (e.g., "America/New_York") instead of a UTC offset.', 'preflight-wp' )
+			);
+		}
+
+		return PreFlight_Check_Result::pass();
 	}
 
-	/** @return PreFlight_Check_Result */
+	/**
+	 * Check: permalink structure set to Plain. (Warning)
+	 *
+	 * @return PreFlight_Check_Result
+	 */
 	public function check_permalink_structure(): PreFlight_Check_Result {
-		return PreFlight_Check_Result::skip( __( 'Not yet implemented.', 'preflight-wp' ) );
+		if ( '' === get_option( 'permalink_structure' ) ) {
+			return PreFlight_Check_Result::fail(
+				__( 'Permalinks are set to Plain — URLs use ?p=123 query strings.', 'preflight-wp' ),
+				__( 'Settings → Permalinks — select any structure other than Plain (recommended: Post name).', 'preflight-wp' )
+			);
+		}
+
+		return PreFlight_Check_Result::pass();
 	}
 
-	/** @return PreFlight_Check_Result */
+	/**
+	 * Check: Site URL and Home URL differ in scheme or host. (Warning)
+	 *
+	 * Legitimate installs exist where WP lives in a subdirectory while the
+	 * public URL is the domain root — this is a Warning, not a Blocker, to
+	 * acknowledge that use case. Suppressible per Brief §3.2.
+	 *
+	 * @return PreFlight_Check_Result
+	 */
 	public function check_url_mismatch(): PreFlight_Check_Result {
-		return PreFlight_Check_Result::skip( __( 'Not yet implemented.', 'preflight-wp' ) );
+		$site = wp_parse_url( site_url() );
+		$home = wp_parse_url( home_url() );
+
+		$site_scheme = isset( $site['scheme'] ) ? strtolower( $site['scheme'] ) : '';
+		$home_scheme = isset( $home['scheme'] ) ? strtolower( $home['scheme'] ) : '';
+		$site_host   = isset( $site['host'] ) ? strtolower( $site['host'] ) : '';
+		$home_host   = isset( $home['host'] ) ? strtolower( $home['host'] ) : '';
+
+		if ( $site_scheme !== $home_scheme || $site_host !== $home_host ) {
+			return PreFlight_Check_Result::fail(
+				__( 'Site URL and Home URL differ in scheme or host.', 'preflight-wp' ),
+				__( 'If WordPress is intentionally installed at a separate location from the public site root, suppress this check. Otherwise, Settings → General — align both URLs to the production domain.', 'preflight-wp' )
+			);
+		}
+
+		return PreFlight_Check_Result::pass();
 	}
 
 	/** @return PreFlight_Check_Result */
