@@ -138,25 +138,76 @@ class PreFlight_Checks_WP_Config implements PreFlight_Check_Category {
 	/**
 	 * Check: default tagline still set. (Blocker)
 	 *
+	 * Compares the current tagline against the locale-translated default string.
+	 * Locale note: a locale change *after* install may cause a false negative if
+	 * the translated default differs from the stored value. Document limitation;
+	 * no runtime workaround at MVP.
+	 *
 	 * @return PreFlight_Check_Result
 	 */
 	public function check_default_tagline(): PreFlight_Check_Result {
-		return PreFlight_Check_Result::skip( __( 'Not yet implemented.', 'preflight-wp' ) );
+		$current = trim( get_bloginfo( 'description' ) );
+		$default = trim( __( 'Just another WordPress site' ) ); // Intentionally no text domain — matches WP core string.
+
+		if ( $current === $default ) {
+			return PreFlight_Check_Result::fail(
+				__( 'Site tagline is the WordPress default.', 'preflight-wp' ),
+				__( 'Settings → General → Tagline — replace with text describing this specific site.', 'preflight-wp' )
+			);
+		}
+
+		return PreFlight_Check_Result::pass();
 	}
 
-	/** @return PreFlight_Check_Result */
+	/**
+	 * Check: search engine indexing discouraged. (Blocker)
+	 *
+	 * @return PreFlight_Check_Result
+	 */
 	public function check_search_engine_visibility(): PreFlight_Check_Result {
-		return PreFlight_Check_Result::skip( __( 'Not yet implemented.', 'preflight-wp' ) );
+		if ( (int) get_option( 'blog_public' ) === 0 ) {
+			return PreFlight_Check_Result::fail(
+				__( 'Search engine indexing is set to Discouraged.', 'preflight-wp' ),
+				__( 'Settings → Reading — uncheck "Discourage search engines from indexing this site" before DNS cutover.', 'preflight-wp' )
+			);
+		}
+
+		return PreFlight_Check_Result::pass();
 	}
 
-	/** @return PreFlight_Check_Result */
+	/**
+	 * Check: WP_DEBUG enabled. (Blocker)
+	 *
+	 * @return PreFlight_Check_Result
+	 */
 	public function check_wp_debug(): PreFlight_Check_Result {
-		return PreFlight_Check_Result::skip( __( 'Not yet implemented.', 'preflight-wp' ) );
+		if ( defined( 'WP_DEBUG' ) && WP_DEBUG === true ) {
+			return PreFlight_Check_Result::fail(
+				__( 'WP_DEBUG is enabled.', 'preflight-wp' ),
+				__( 'wp-config.php — set define(\'WP_DEBUG\', false); for production.', 'preflight-wp' )
+			);
+		}
+
+		return PreFlight_Check_Result::pass();
 	}
 
-	/** @return PreFlight_Check_Result */
+	/**
+	 * Check: WP_DEBUG_DISPLAY enabled. (Blocker)
+	 *
+	 * Reported even when WP_DEBUG is false — enabling WP_DEBUG later would
+	 * immediately leak errors to page output if WP_DEBUG_DISPLAY is already true.
+	 *
+	 * @return PreFlight_Check_Result
+	 */
 	public function check_wp_debug_display(): PreFlight_Check_Result {
-		return PreFlight_Check_Result::skip( __( 'Not yet implemented.', 'preflight-wp' ) );
+		if ( defined( 'WP_DEBUG_DISPLAY' ) && WP_DEBUG_DISPLAY === true ) {
+			return PreFlight_Check_Result::fail(
+				__( 'WP_DEBUG_DISPLAY is enabled — PHP errors will print to page output when WP_DEBUG is also enabled.', 'preflight-wp' ),
+				__( 'wp-config.php — set define(\'WP_DEBUG_DISPLAY\', false); before any WP_DEBUG definition.', 'preflight-wp' )
+			);
+		}
+
+		return PreFlight_Check_Result::pass();
 	}
 
 	/** @return PreFlight_Check_Result */
