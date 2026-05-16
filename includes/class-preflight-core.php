@@ -43,6 +43,7 @@ class PreFlight_Core {
 		require_once PREFLIGHT_PATH . 'includes/checks/class-checks-content.php';
 		require_once PREFLIGHT_PATH . 'includes/checks/class-checks-seo.php';
 		require_once PREFLIGHT_PATH . 'includes/checks/class-checks-security.php';
+		require_once PREFLIGHT_PATH . 'includes/checks/class-checks-forms.php';
 		do_action( 'preflight_register_categories', $this );
 	}
 
