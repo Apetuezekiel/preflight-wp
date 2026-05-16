@@ -47,6 +47,12 @@ class PreFlight_Core {
 		require_once PREFLIGHT_PATH . 'includes/checks/class-checks-performance.php';
 		require_once PREFLIGHT_PATH . 'includes/checks/class-checks-plugins.php';
 		do_action( 'preflight_register_categories', $this );
+
+		if ( is_admin() ) {
+			require_once PREFLIGHT_PATH . 'includes/class-preflight-history.php';
+			require_once PREFLIGHT_PATH . 'includes/class-preflight-admin.php';
+			new PreFlight_Admin( $this, new PreFlight_History() );
+		}
 	}
 
 	/**

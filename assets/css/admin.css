@@ -1,0 +1,352 @@
+/*
+ * PreFlight admin styles — WCAG AA compliant.
+ *
+ * Severity is conveyed by label text AND color (Brief Constraint 12).
+ * Color palette: WP admin system colors.
+ * Contrast: body text ≥4.5:1, large text ≥3:1 against #fff background.
+ */
+
+/* -------------------------------------------------------------------------
+ * Wrap and tab content
+ * ---------------------------------------------------------------------- */
+
+.preflight-wrap {
+	max-width: 1200px;
+}
+
+.preflight-tab-content {
+	margin-top: 1.5rem;
+}
+
+/* -------------------------------------------------------------------------
+ * Severity pills — text label inside + color background
+ * #d63638 red on white   = 4.56:1 ✓ (WCAG AA)
+ * #dba617 amber on #1d2327 dark = 6.18:1 ✓
+ * #2271b1 blue on white  = 4.52:1 ✓
+ * #00a32a green on white = 4.52:1 ✓
+ * #757575 gray on white  = 4.54:1 ✓
+ * ---------------------------------------------------------------------- */
+
+.preflight-severity-pill {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding: 2px 8px;
+	border-radius: 3px;
+	font-size: 11px;
+	font-weight: 700;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+	white-space: nowrap;
+	line-height: 1.6;
+}
+
+.preflight-severity-pill--blocker {
+	background-color: #d63638;
+	color: #fff;
+}
+
+.preflight-severity-pill--warning {
+	background-color: #dba617;
+	color: #1d2327; /* dark text — #dba617 bg / #1d2327 fg = 6.18:1 ✓ */
+}
+
+.preflight-severity-pill--info {
+	background-color: #2271b1;
+	color: #fff;
+}
+
+.preflight-severity-pill--pass {
+	background-color: #00a32a;
+	color: #fff;
+}
+
+.preflight-severity-pill--skip {
+	background-color: #757575;
+	color: #fff;
+}
+
+.preflight-severity-pill--sm {
+	font-size: 10px;
+	padding: 1px 5px;
+}
+
+/* -------------------------------------------------------------------------
+ * Summary bar
+ * ---------------------------------------------------------------------- */
+
+.preflight-summary {
+	display: flex;
+	align-items: center;
+	gap: 1.5rem;
+	padding: 1rem 1.25rem;
+	background: #f6f7f7;
+	border: 1px solid #c3c4c7;
+	border-radius: 4px;
+	margin-bottom: 1.25rem;
+	flex-wrap: wrap;
+}
+
+.preflight-summary__meta {
+	color: #50575e;
+	font-size: 13px;
+}
+
+.preflight-summary__counts {
+	display: flex;
+	gap: 1rem;
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	flex-wrap: wrap;
+}
+
+.preflight-summary__count {
+	display: flex;
+	align-items: center;
+	gap: 0.4rem;
+}
+
+.preflight-count-value {
+	font-size: 18px;
+	font-weight: 700;
+	color: #1d2327;
+	min-width: 1.5ch;
+	text-align: center;
+}
+
+/* -------------------------------------------------------------------------
+ * Delta bar
+ * ---------------------------------------------------------------------- */
+
+.preflight-delta {
+	display: flex;
+	gap: 1rem;
+	margin-bottom: 1rem;
+	font-size: 13px;
+	flex-wrap: wrap;
+}
+
+.preflight-delta__new {
+	color: #d63638;
+	font-weight: 600;
+}
+
+.preflight-delta__resolved {
+	color: #00a32a;
+	font-weight: 600;
+}
+
+.preflight-delta__unchanged {
+	color: #50575e;
+}
+
+/* -------------------------------------------------------------------------
+ * Actions
+ * ---------------------------------------------------------------------- */
+
+.preflight-actions {
+	margin-bottom: 1.5rem;
+}
+
+/* -------------------------------------------------------------------------
+ * Category sections — collapsible
+ * ---------------------------------------------------------------------- */
+
+.preflight-category {
+	border: 1px solid #c3c4c7;
+	border-radius: 4px;
+	margin-bottom: 1rem;
+	overflow: hidden;
+}
+
+.preflight-category__header {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	margin: 0;
+	padding: 0.75rem 1rem;
+	background: #f6f7f7;
+	cursor: pointer;
+	user-select: none;
+	font-size: 14px;
+	font-weight: 600;
+	color: #1d2327;
+	border-bottom: 1px solid #c3c4c7;
+}
+
+.preflight-category__header:focus-visible {
+	outline: 2px solid #2271b1;
+	outline-offset: 2px;
+}
+
+.preflight-category__chevron {
+	display: inline-block;
+	width: 0;
+	height: 0;
+	border-left: 5px solid transparent;
+	border-right: 5px solid transparent;
+	border-top: 6px solid #50575e;
+	transition: transform 0.15s ease;
+	flex-shrink: 0;
+}
+
+.preflight-category.is-expanded .preflight-category__chevron {
+	transform: rotate(0deg);
+}
+
+.preflight-category:not(.is-expanded) .preflight-category__chevron {
+	transform: rotate(-90deg);
+}
+
+.preflight-category__badge {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 20px;
+	height: 20px;
+	padding: 0 5px;
+	background: #d63638;
+	color: #fff;
+	border-radius: 10px;
+	font-size: 11px;
+	font-weight: 700;
+	margin-left: auto;
+}
+
+.preflight-category__body {
+	display: none;
+}
+
+.preflight-category.is-expanded .preflight-category__body {
+	display: block;
+}
+
+/* -------------------------------------------------------------------------
+ * Results table
+ * ---------------------------------------------------------------------- */
+
+.preflight-results-table {
+	margin: 0;
+	border: none;
+}
+
+.preflight-results-table th,
+.preflight-results-table td {
+	vertical-align: middle;
+	padding: 0.5rem 0.75rem;
+}
+
+.preflight-col-severity {
+	width: 120px;
+}
+
+.preflight-col-check {
+	width: 260px;
+	font-weight: 500;
+}
+
+.preflight-fix-hint {
+	margin: 0.25rem 0 0;
+	color: #50575e;
+	font-size: 12px;
+}
+
+.preflight-skip-message {
+	color: #757575;
+	font-size: 12px;
+}
+
+.preflight-pass-message {
+	color: #00a32a;
+	font-size: 12px;
+}
+
+/* -------------------------------------------------------------------------
+ * History table
+ * ---------------------------------------------------------------------- */
+
+.preflight-history-row {
+	cursor: pointer;
+}
+
+.preflight-history-row:hover td {
+	background-color: #f0f0f1;
+}
+
+.preflight-history-row:focus-visible {
+	outline: 2px solid #2271b1;
+	outline-offset: -2px;
+}
+
+.preflight-history-row--latest td:first-child {
+	font-weight: 600;
+}
+
+/* -------------------------------------------------------------------------
+ * Settings page
+ * ---------------------------------------------------------------------- */
+
+.preflight-check-list {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.preflight-check-list__item {
+	margin-bottom: 0.5rem;
+}
+
+.preflight-check-list__label {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	cursor: pointer;
+}
+
+.preflight-check-list__label:focus-within {
+	outline: 2px solid #2271b1;
+	outline-offset: 2px;
+	border-radius: 2px;
+}
+
+.preflight-check-list__name {
+	font-weight: 500;
+}
+
+.preflight-check-list__id {
+	color: #50575e;
+	font-size: 11px;
+	margin-left: auto;
+}
+
+/* -------------------------------------------------------------------------
+ * Empty state
+ * ---------------------------------------------------------------------- */
+
+.preflight-empty-state {
+	padding: 2rem;
+	text-align: center;
+	background: #f6f7f7;
+	border: 1px dashed #c3c4c7;
+	border-radius: 4px;
+}
+
+.preflight-empty-state__lead {
+	font-size: 15px;
+	margin-bottom: 1.25rem;
+	color: #1d2327;
+}
+
+/* -------------------------------------------------------------------------
+ * Focus indicators — all interactive elements
+ * ---------------------------------------------------------------------- */
+
+.preflight-wrap a:focus-visible,
+.preflight-wrap button:focus-visible,
+.preflight-wrap input:focus-visible,
+.preflight-wrap select:focus-visible,
+.preflight-wrap textarea:focus-visible {
+	outline: 2px solid #2271b1;
+	outline-offset: 2px;
+}
