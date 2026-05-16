@@ -226,21 +226,45 @@ class PreFlight_Checks_Security implements PreFlight_Check_Category {
 	/**
 	 * Fail when in-dashboard theme/plugin file editing is not disabled.
 	 *
+	 * Checks that DISALLOW_FILE_EDIT is defined and strictly true. If it is
+	 * undefined or set to false/any other value, the editors are accessible.
+	 *
 	 * @since 0.4.0
 	 * @return PreFlight_Check_Result
 	 */
 	public function check_file_editing(): PreFlight_Check_Result {
-		return PreFlight_Check_Result::skip( 'not yet implemented' );
+		if ( ! defined( 'DISALLOW_FILE_EDIT' ) || true !== DISALLOW_FILE_EDIT ) {
+			return PreFlight_Check_Result::fail(
+				__( 'WordPress allows in-dashboard editing of theme and plugin files. An admin account with edit permissions can modify executable PHP files directly through the admin UI.', 'preflight-wp' ),
+				__( 'In wp-config.php, add: define(\'DISALLOW_FILE_EDIT\', true); — this disables the Theme and Plugin file editors.', 'preflight-wp' )
+			);
+		}
+
+		return PreFlight_Check_Result::pass();
 	}
 
 	/**
 	 * Fail when the database table prefix is the WordPress default 'wp_'.
 	 *
+	 * Reads $wpdb->prefix (a property, not a query). $wpdb is a global
+	 * populated by WordPress core before plugins_loaded fires; it is always
+	 * available at scan time. Security-through-obscurity: Info severity
+	 * reflects the low practical impact of the default prefix.
+	 *
 	 * @since 0.4.0
 	 * @return PreFlight_Check_Result
 	 */
 	public function check_table_prefix(): PreFlight_Check_Result {
-		return PreFlight_Check_Result::skip( 'not yet implemented' );
+		global $wpdb;
+
+		if ( 'wp_' === $wpdb->prefix ) {
+			return PreFlight_Check_Result::fail(
+				__( 'Database table prefix is the default wp_. Changing it is a minor obscurity step against generic SQL injection attempts that hardcode wp_ table names.', 'preflight-wp' ),
+				__( 'Changing the prefix on an existing install requires renaming tables and updating wp-config.php and a few serialized option keys. Best done at install time. If migrating, use WP-CLI or a dedicated plugin and verify nothing breaks before completing the launch.', 'preflight-wp' )
+			);
+		}
+
+		return PreFlight_Check_Result::pass();
 	}
 }
 
