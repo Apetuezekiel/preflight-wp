@@ -68,6 +68,8 @@ class PreFlight_Scanner {
 	public function run(): array {
 		$scan_start = time();
 
+		$this->raise_resource_limits();
+
 		self::$scan_in_progress = true;
 		self::$partial_results  = array();
 
@@ -289,6 +291,29 @@ class PreFlight_Scanner {
 		}
 
 		return $summary;
+	}
+
+	/**
+	 * Raise PHP memory and execution time limits before the scan begins.
+	 *
+	 * wp_raise_memory_limit('admin') bumps the limit to WP_MAX_MEMORY_LIMIT
+	 * (default 256 MB) for admin contexts. set_time_limit(60) gives the scan
+	 * a 60-second ceiling; @ suppresses the warning on hosts where the function
+	 * is callable but the time-limit ini setting is locked.
+	 *
+	 * Both calls are guarded by function_exists() in case they are listed in
+	 * PHP's disable_functions (§5.2).
+	 *
+	 * @since 0.2.0
+	 */
+	private function raise_resource_limits(): void {
+		if ( function_exists( 'wp_raise_memory_limit' ) ) {
+			wp_raise_memory_limit( 'admin' );
+		}
+		if ( function_exists( 'set_time_limit' ) ) {
+			// phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+			@set_time_limit( 60 );
+		}
 	}
 
 	/**
