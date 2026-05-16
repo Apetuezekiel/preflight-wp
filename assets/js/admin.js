@@ -51,18 +51,23 @@ document.addEventListener( 'DOMContentLoaded', function () {
 	}
 
 	// -------------------------------------------------------------------------
-	// AJAX rescan
+	// AJAX rescan — delegated to stable #preflight-dashboard parent so the
+	// listener survives innerHTML replacement after each scan.
 	// -------------------------------------------------------------------------
 
-	var rescanBtn = document.getElementById( 'preflight-rescan-btn' );
 	var statusEl  = document.getElementById( 'preflight-status' );
 	var dashboard = document.getElementById( 'preflight-dashboard' );
 
-	if ( ! rescanBtn || ! dashboard ) {
+	if ( ! dashboard ) {
 		return;
 	}
 
-	rescanBtn.addEventListener( 'click', function ( e ) {
+	dashboard.addEventListener( 'click', function ( e ) {
+		var btn = e.target.closest( '#preflight-rescan-btn' );
+		if ( ! btn ) {
+			return;
+		}
+
 		// Only intercept if fetch is available.
 		if ( typeof fetch === 'undefined' ) {
 			return;
@@ -70,8 +75,8 @@ document.addEventListener( 'DOMContentLoaded', function () {
 
 		e.preventDefault();
 
-		rescanBtn.disabled    = true;
-		rescanBtn.textContent = ( preflight && preflight.scanning ) ? preflight.scanning : 'Scanning…';
+		btn.disabled    = true;
+		btn.textContent = ( preflight && preflight.scanning ) ? preflight.scanning : 'Scanning…';
 
 		if ( statusEl ) {
 			statusEl.textContent = ( preflight && preflight.scanning ) ? preflight.scanning : 'Scanning…';
@@ -94,6 +99,7 @@ document.addEventListener( 'DOMContentLoaded', function () {
 				dashboard.innerHTML = data.data.html_partial;
 
 				// Re-attach collapse behaviour to newly injected headers.
+				// (The rescan-btn delegation on dashboard survives automatically.)
 				var newHeaders = dashboard.querySelectorAll( '.preflight-category__header' );
 				for ( var j = 0; j < newHeaders.length; j++ ) {
 					( function ( h ) {
@@ -111,29 +117,33 @@ document.addEventListener( 'DOMContentLoaded', function () {
 					statusEl.textContent = 'Scan complete.';
 				}
 			} else {
-				showError();
+				showError( dashboard );
 			}
 		} )
 		.catch( function () {
-			showError();
+			showError( dashboard );
 		} )
 		.finally( function () {
-			rescanBtn.disabled    = false;
-			rescanBtn.textContent = ( preflight && preflight.rescan ) ? preflight.rescan : 'Re-scan';
+			// btn may be gone if the DOM was replaced; re-query by ID.
+			var newBtn = document.getElementById( 'preflight-rescan-btn' );
+			if ( newBtn ) {
+				newBtn.disabled    = false;
+				newBtn.textContent = ( preflight && preflight.rescan ) ? preflight.rescan : 'Re-scan';
+			}
 		} );
 	} );
 
-	function showError() {
+	function showError( container ) {
 		var errorMsg = ( preflight && preflight.scanError ) ? preflight.scanError : 'Scan failed. Please try again.';
 		var notice   = document.createElement( 'div' );
 		notice.className = 'notice notice-error';
 		notice.innerHTML = '<p>' + errorMsg + '</p>';
 
-		var existing = dashboard.querySelector( '.notice-error' );
+		var existing = container.querySelector( '.notice-error' );
 		if ( existing ) {
 			existing.remove();
 		}
-		dashboard.insertBefore( notice, dashboard.firstChild );
+		container.insertBefore( notice, container.firstChild );
 
 		if ( statusEl ) {
 			statusEl.textContent = errorMsg;
