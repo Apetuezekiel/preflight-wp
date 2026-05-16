@@ -111,8 +111,9 @@ class PreFlight_Scanner {
 	/**
 	 * Execute a single check and return a result row.
 	 *
-	 * try/catch wrapping is added in the next commit. This baseline calls
-	 * check->run() directly so the envelope shape is testable independently.
+	 * Any \Throwable thrown by check->run() is caught and converted to a skip
+	 * result containing the exception class name and message. This guarantees
+	 * that a misbehaving check never crashes the scan (§5.2).
 	 *
 	 * @since  0.2.0
 	 * @param  PreFlight_Check $check
@@ -120,7 +121,14 @@ class PreFlight_Scanner {
 	 * @return array {id, category, label, severity, status, message, fix_hint}
 	 */
 	protected function run_single_check( PreFlight_Check $check, string $category_id ): array {
-		$result   = $check->run();
+		try {
+			$result = $check->run();
+		} catch ( \Throwable $e ) {
+			$result = PreFlight_Check_Result::skip(
+				get_class( $e ) . ': ' . $e->getMessage()
+			);
+		}
+
 		$severity = $this->apply_severity( $check->get_id(), $check->get_default_severity() );
 
 		return array(
