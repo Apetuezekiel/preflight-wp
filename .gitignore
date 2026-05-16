@@ -35,6 +35,9 @@ wp-config.php
 # htaccess
 /.htaccess
 
+# Test scripts (never committed — see CLAUDE.md)
+scripts/
+
 # Editor and OS artifacts
 .vscode/
 .idea/
