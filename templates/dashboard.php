@@ -8,6 +8,7 @@
  *   $is_first_scan   (bool)       — true when there is no previous scan to compare.
  *   $scan_action_url (string)     — form action URL.
  *   $rescan_nonce    (string)     — nonce value for the scan trigger form.
+ *   $is_historical   (bool)       — true when displaying a historical scan (not latest).
  *
  * @package PreFlight
  */
@@ -15,6 +16,8 @@
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
+
+$is_historical = isset( $is_historical ) ? (bool) $is_historical : false;
 ?>
 <div id="preflight-dashboard">
 
@@ -74,6 +77,26 @@ if ( ! defined( 'ABSPATH' ) ) {
 		</ul>
 	</div>
 
+	<?php /* Historical scan banner */ ?>
+	<?php if ( $is_historical ) : ?>
+		<div class="notice notice-info preflight-historical-notice">
+			<p>
+				<?php
+				echo esc_html(
+					sprintf(
+						/* translators: %s: scan timestamp */
+						__( 'Viewing historical scan from %s.', 'preflight-wp' ),
+						wp_date( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), strtotime( $timestamp ) )
+					)
+				);
+				?>
+				<a href="<?php echo esc_url( admin_url( 'tools.php?page=preflight&tab=dashboard' ) ); ?>">
+					<?php esc_html_e( 'View latest scan', 'preflight-wp' ); ?>
+				</a>
+			</p>
+		</div>
+	<?php endif; ?>
+
 	<?php /* Delta section — shown after first scan */ ?>
 	<?php if ( ! $is_first_scan ) : ?>
 		<?php
@@ -113,7 +136,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 		</div>
 	<?php endif; ?>
 
-	<?php /* Re-scan button */ ?>
+	<?php /* Re-scan button — hidden when browsing a historical scan */ ?>
+	<?php if ( ! $is_historical ) : ?>
 	<div class="preflight-actions">
 		<form method="post" action="<?php echo esc_url( $scan_action_url ); ?>" id="preflight-rescan-form">
 			<?php wp_nonce_field( 'preflight_run_scan', 'preflight_scan_nonce' ); ?>
@@ -122,6 +146,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 			</button>
 		</form>
 	</div>
+	<?php endif; ?>
 
 	<?php /* Results grouped by category */ ?>
 	<?php
