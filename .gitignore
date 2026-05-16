@@ -35,6 +35,10 @@ wp-config.php
 # htaccess
 /.htaccess
 
+# Project guidance files (local only — not for public repo)
+CLAUDE.md
+BRIEF.md
+
 # Test scripts (never committed — see CLAUDE.md)
 scripts/
 
