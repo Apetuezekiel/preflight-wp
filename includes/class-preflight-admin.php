@@ -127,13 +127,15 @@ class PreFlight_Admin {
 		$all_check_ids = array();
 		foreach ( $this->core->get_categories() as $category ) {
 			foreach ( $category->get_check_ids() as $check_id ) {
-				$all_check_ids[] = sanitize_key( $check_id );
+				$all_check_ids[] = $check_id;
 			}
 		}
 
 		// Collect checked (enabled) check IDs from the POST.
+		// sanitize_check_ids() whitelists against the live registry — sanitize_key() must
+		// NOT be used here because it strips dots, and check IDs use dot notation.
 		$raw_enabled = isset( $_POST['enabled_checks'] ) ? (array) $_POST['enabled_checks'] : array();
-		$enabled     = array_map( 'sanitize_key', $raw_enabled );
+		$enabled     = $this->sanitize_check_ids( $raw_enabled );
 
 		// Disabled = all known - enabled (unchecked boxes are not submitted by browser).
 		$disabled = array_values( array_diff( $all_check_ids, $enabled ) );
@@ -311,14 +313,47 @@ class PreFlight_Admin {
 	 * @since  0.3.0
 	 */
 	private function render_dashboard_tab(): void {
-		$envelope      = $this->history->get_latest();
-		$previous      = $this->history->get_previous();
-		$is_first_scan = ( null !== $envelope && null === $previous );
-		$delta         = ( null !== $envelope )
-			? $this->history->compute_delta( $envelope, $previous )
-			: array( 'new' => array(), 'resolved' => array(), 'unchanged' => array() );
+		$history      = $this->history->get_all();
+		$is_historical = false;
 
-		// Success notice.
+		$raw_index = isset( $_GET['scan_index'] ) ? $_GET['scan_index'] : null;
+
+		if ( null !== $raw_index ) {
+			$scan_index = absint( $raw_index );
+
+			if ( isset( $history[ $scan_index ] ) ) {
+				// Valid historical scan. Delta compares this scan against the next-older
+				// entry (scan_index + 1) rather than the current-vs-previous pair, so the
+				// user sees changes relative to the scan that preceded the one they are viewing.
+				$envelope      = $history[ $scan_index ];
+				$previous      = isset( $history[ $scan_index + 1 ] ) ? $history[ $scan_index + 1 ] : null;
+				$is_first_scan = false;
+				$is_historical = true;
+				$delta         = $this->history->compute_delta( $envelope, $previous );
+			} else {
+				// Out-of-range index — redirect to history tab with a notice.
+				wp_safe_redirect(
+					add_query_arg(
+						array(
+							'page'        => 'preflight',
+							'tab'         => 'history',
+							'bad_index'   => '1',
+						),
+						admin_url( 'tools.php' )
+					)
+				);
+				exit;
+			}
+		} else {
+			$envelope      = $this->history->get_latest();
+			$previous      = $this->history->get_previous();
+			$is_first_scan = ( null !== $envelope && null === $previous );
+			$delta         = ( null !== $envelope )
+				? $this->history->compute_delta( $envelope, $previous )
+				: array( 'new' => array(), 'resolved' => array(), 'unchanged' => array() );
+		}
+
+		// Success notice after synchronous scan.
 		if ( isset( $_GET['scanned'] ) && '1' === $_GET['scanned'] ) {
 			echo '<div class="notice notice-success is-dismissible"><p>' . esc_html__( 'Scan complete.', 'preflight-wp' ) . '</p></div>';
 		}
@@ -327,7 +362,7 @@ class PreFlight_Admin {
 		$rescan_nonce    = wp_create_nonce( 'preflight_run_scan' );
 
 		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-		echo $this->render_dashboard_partial( $envelope, $delta, $is_first_scan, $scan_action_url, $rescan_nonce );
+		echo $this->render_dashboard_partial( $envelope, $delta, $is_first_scan, $scan_action_url, $rescan_nonce, $is_historical );
 	}
 
 	/**
@@ -339,6 +374,7 @@ class PreFlight_Admin {
 	 * @param  bool       $is_first_scan   True when there is no previous scan to compare.
 	 * @param  string     $scan_action_url Form action URL.
 	 * @param  string     $rescan_nonce    Nonce value for the scan trigger form.
+	 * @param  bool       $is_historical   True when displaying a past scan (not the latest).
 	 * @return string
 	 */
 	private function render_dashboard_partial(
@@ -346,7 +382,8 @@ class PreFlight_Admin {
 		array $delta,
 		bool $is_first_scan,
 		string $scan_action_url = '',
-		string $rescan_nonce = ''
+		string $rescan_nonce = '',
+		bool $is_historical = false
 	): string {
 		if ( '' === $scan_action_url ) {
 			$scan_action_url = admin_url( 'tools.php?page=preflight&tab=dashboard' );
@@ -374,6 +411,34 @@ class PreFlight_Admin {
 		if ( file_exists( $template ) ) {
 			include $template;
 		}
+	}
+
+	/**
+	 * Whitelist-validate an array of check IDs against the live registry.
+	 *
+	 * sanitize_key() MUST NOT be used for check IDs — it strips dots, and check IDs
+	 * use dot notation (e.g. "wp-config.default-tagline"). This method accepts only
+	 * IDs that already exist in the registered categories.
+	 *
+	 * @since  0.3.0
+	 * @param  string[] $input Raw values from POST['enabled_checks'].
+	 * @return string[]        Only values that match a registered check ID.
+	 */
+	private function sanitize_check_ids( array $input ): array {
+		$all_check_ids = array();
+		foreach ( $this->core->get_categories() as $category ) {
+			foreach ( $category->get_check_ids() as $check_id ) {
+				$all_check_ids[] = $check_id;
+			}
+		}
+
+		$valid = array();
+		foreach ( $input as $value ) {
+			if ( is_string( $value ) && in_array( $value, $all_check_ids, true ) ) {
+				$valid[] = $value;
+			}
+		}
+		return $valid;
 	}
 
 	/**
