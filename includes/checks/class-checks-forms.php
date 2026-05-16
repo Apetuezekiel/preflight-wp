@@ -171,21 +171,42 @@ class PreFlight_Checks_Forms implements PreFlight_Check_Category {
 	/**
 	 * Fail when no recognised SMTP / transactional email plugin is active.
 	 *
+	 * Checks for plugin presence only — does not send a test email or verify
+	 * SMTP credentials. A delivery test requires sending a real email, which
+	 * is out of scope for the MVP scan (Brief §5.2).
+	 *
 	 * @since 0.6.0
 	 * @return PreFlight_Check_Result
 	 */
 	public function check_smtp_plugin(): PreFlight_Check_Result {
-		return PreFlight_Check_Result::skip( 'not yet implemented' );
+		if ( null !== $this->matches_any_signal( self::SMTP_PLUGIN_SIGNALS ) ) {
+			return PreFlight_Check_Result::pass();
+		}
+
+		return PreFlight_Check_Result::fail(
+			__( 'No transactional email plugin is active. WordPress will fall back to PHP\'s mail() function, which is unreliable on most managed hosts — password resets, order notifications, and contact form submissions may silently fail to deliver.', 'preflight-wp' ),
+			__( 'Install and configure WP Mail SMTP, FluentSMTP, Post SMTP, or Easy WP SMTP. Connect it to a transactional email service (SendGrid, Postmark, Amazon SES, Mailgun, or the host\'s built-in mailer). After launch, verify delivery by sending a test email and triggering a password reset.', 'preflight-wp' )
+		);
 	}
 
 	/**
 	 * Fail when no recognised contact form plugin is active.
 	 *
+	 * Iterates CONTACT_FORM_SIGNALS; passes on the first match. Info severity
+	 * reflects that not every site needs a contact form.
+	 *
 	 * @since 0.6.0
 	 * @return PreFlight_Check_Result
 	 */
 	public function check_contact_form(): PreFlight_Check_Result {
-		return PreFlight_Check_Result::skip( 'not yet implemented' );
+		if ( null !== $this->matches_any_signal( self::CONTACT_FORM_SIGNALS ) ) {
+			return PreFlight_Check_Result::pass();
+		}
+
+		return PreFlight_Check_Result::fail(
+			__( 'No recognized contact form plugin is active.', 'preflight-wp' ),
+			__( 'If the site needs a contact form, install one of: Contact Form 7, Gravity Forms, WPForms, Ninja Forms, Fluent Forms, Formidable Forms. If the site uses a custom form or no form at all, suppress this check.', 'preflight-wp' )
+		);
 	}
 
 	// -------------------------------------------------------------------------
