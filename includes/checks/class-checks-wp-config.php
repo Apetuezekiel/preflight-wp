@@ -316,24 +316,153 @@ class PreFlight_Checks_WP_Config implements PreFlight_Check_Category {
 		return PreFlight_Check_Result::pass();
 	}
 
-	/** @return PreFlight_Check_Result */
+	/**
+	 * Check: site URL host matches a known staging/local pattern. (Blocker)
+	 *
+	 * Uses STAGING_HOSTS class constant. Exact matches are full-host comparisons;
+	 * suffix matches use str_ends_with on a lowercased host.
+	 *
+	 * Extension point: a 'preflight_staging_hosts' filter will be added in v1.1
+	 * to allow custom host lists. Not wired here — intent documented only.
+	 *
+	 * @return PreFlight_Check_Result
+	 */
 	public function check_staging_host(): PreFlight_Check_Result {
-		return PreFlight_Check_Result::skip( __( 'Not yet implemented.', 'preflight-wp' ) );
+		$host = strtolower( (string) wp_parse_url( site_url(), PHP_URL_HOST ) );
+
+		if ( in_array( $host, self::STAGING_HOSTS['exact'], true ) ) {
+			return $this->staging_fail( $host );
+		}
+
+		foreach ( self::STAGING_HOSTS['suffix'] as $suffix ) {
+			if ( str_ends_with( $host, $suffix ) ) {
+				return $this->staging_fail( $host );
+			}
+		}
+
+		return PreFlight_Check_Result::pass();
 	}
 
-	/** @return PreFlight_Check_Result */
+	/**
+	 * Build the fail result for a staging host match.
+	 *
+	 * @param  string $host
+	 * @return PreFlight_Check_Result
+	 */
+	private function staging_fail( string $host ): PreFlight_Check_Result {
+		return PreFlight_Check_Result::fail(
+			sprintf(
+				/* translators: %s: site URL hostname */
+				__( 'Site URL host "%s" matches a known staging or local-development pattern.', 'preflight-wp' ),
+				$host
+			),
+			__( 'Update Site URL and Home URL to the production domain before launch. If this IS the production site, suppress this check.', 'preflight-wp' )
+		);
+	}
+
+	/**
+	 * Check: site URL host contains a generic dev/staging substring. (Warning)
+	 *
+	 * Runs independently of check_staging_host — both can fire together.
+	 * Suppressible per Brief §3.2 for legitimate production domains that
+	 * contain one of these substrings.
+	 *
+	 * @return PreFlight_Check_Result
+	 */
 	public function check_dev_substring(): PreFlight_Check_Result {
-		return PreFlight_Check_Result::skip( __( 'Not yet implemented.', 'preflight-wp' ) );
+		$host     = strtolower( (string) wp_parse_url( site_url(), PHP_URL_HOST ) );
+		$patterns = array( 'dev.', 'staging.', '-staging', '-dev', '.dev-', '.staging-' );
+
+		foreach ( $patterns as $pattern ) {
+			if ( strpos( $host, $pattern ) !== false ) {
+				return PreFlight_Check_Result::fail(
+					sprintf(
+						/* translators: %s: site URL hostname */
+						__( 'Site URL host "%s" contains a generic development/staging substring.', 'preflight-wp' ),
+						$host
+					),
+					__( 'If this substring is part of the legitimate production domain, suppress this check. Otherwise, update Site URL and Home URL to the production domain.', 'preflight-wp' )
+				);
+			}
+		}
+
+		return PreFlight_Check_Result::pass();
 	}
 
-	/** @return PreFlight_Check_Result */
+	/**
+	 * Check: URL scheme inconsistency across Site URL, Home URL, WP_CONTENT_URL. (Warning)
+	 *
+	 * WP_CONTENT_URL is only inspected when explicitly defined — the default
+	 * value (site_url() . '/wp-content') would always match site_url()'s scheme.
+	 *
+	 * @return PreFlight_Check_Result
+	 */
 	public function check_scheme_consistency(): PreFlight_Check_Result {
-		return PreFlight_Check_Result::skip( __( 'Not yet implemented.', 'preflight-wp' ) );
+		$schemes = array();
+		$sources = array();
+
+		$site_scheme = strtolower( (string) wp_parse_url( site_url(), PHP_URL_SCHEME ) );
+		$home_scheme = strtolower( (string) wp_parse_url( home_url(), PHP_URL_SCHEME ) );
+
+		$schemes[] = $site_scheme;
+		$sources[]  = 'Site URL';
+		$schemes[] = $home_scheme;
+		$sources[]  = 'Home URL';
+
+		if ( defined( 'WP_CONTENT_URL' ) ) {
+			$content_scheme = strtolower( (string) wp_parse_url( WP_CONTENT_URL, PHP_URL_SCHEME ) );
+			$schemes[]      = $content_scheme;
+			$sources[]      = 'WP_CONTENT_URL';
+		}
+
+		if ( count( array_unique( $schemes ) ) > 1 ) {
+			return PreFlight_Check_Result::fail(
+				sprintf(
+					/* translators: %s: comma-separated list of URL sources checked */
+					__( 'URL schemes are not consistent across %s.', 'preflight-wp' ),
+					implode( ', ', $sources )
+				),
+				__( 'Align all URL schemes to https for production. Update wp-config.php if WP_CONTENT_URL is explicitly defined.', 'preflight-wp' )
+			);
+		}
+
+		return PreFlight_Check_Result::pass();
 	}
 
-	/** @return PreFlight_Check_Result */
+	/**
+	 * Check: automatic updates for WordPress core disabled. (Info)
+	 *
+	 * Fires if any of three disable mechanisms are active:
+	 *   - AUTOMATIC_UPDATER_DISABLED constant
+	 *   - WP_AUTO_UPDATE_CORE === false
+	 *   - wp_is_auto_update_enabled_for_type('core') returns false (WP 5.5+)
+	 *
+	 * @return PreFlight_Check_Result
+	 */
 	public function check_auto_updates(): PreFlight_Check_Result {
-		return PreFlight_Check_Result::skip( __( 'Not yet implemented.', 'preflight-wp' ) );
+		if ( defined( 'AUTOMATIC_UPDATER_DISABLED' ) && AUTOMATIC_UPDATER_DISABLED === true ) {
+			return $this->auto_updates_fail();
+		}
+
+		if ( defined( 'WP_AUTO_UPDATE_CORE' ) && WP_AUTO_UPDATE_CORE === false ) {
+			return $this->auto_updates_fail();
+		}
+
+		if ( function_exists( 'wp_is_auto_update_enabled_for_type' ) && ! wp_is_auto_update_enabled_for_type( 'core' ) ) {
+			return $this->auto_updates_fail();
+		}
+
+		return PreFlight_Check_Result::pass();
+	}
+
+	/**
+	 * @return PreFlight_Check_Result
+	 */
+	private function auto_updates_fail(): PreFlight_Check_Result {
+		return PreFlight_Check_Result::fail(
+			__( 'Automatic updates for WordPress core are disabled.', 'preflight-wp' ),
+			__( 'If updates are managed manually (e.g., via a deployment pipeline), this is informational only. Otherwise, remove AUTOMATIC_UPDATER_DISABLED or WP_AUTO_UPDATE_CORE constants from wp-config.php.', 'preflight-wp' )
+		);
 	}
 }
 
