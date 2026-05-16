@@ -123,21 +123,48 @@ class PreFlight_Checks_Security implements PreFlight_Check_Category {
 	/**
 	 * Fail when the site's Home URL is not configured for HTTPS.
 	 *
+	 * Uses parse_url( home_url() ) rather than is_ssl() — the latter is a
+	 * per-request runtime check that would always return false during a CLI
+	 * or non-HTTPS admin scan, masking a correctly-configured HTTPS site.
+	 * The pre-launch signal is whether the stored Home URL uses https.
+	 *
 	 * @since 0.4.0
 	 * @return PreFlight_Check_Result
 	 */
 	public function check_ssl(): PreFlight_Check_Result {
-		return PreFlight_Check_Result::skip( 'not yet implemented' );
+		$scheme = parse_url( home_url(), PHP_URL_SCHEME );
+
+		if ( 'https' !== $scheme ) {
+			return PreFlight_Check_Result::fail(
+				__( 'Site is not configured for HTTPS — Site Address uses an http scheme.', 'preflight-wp' ),
+				__( 'Install an SSL certificate (most hosts offer free Let\'s Encrypt). Then go to Settings → General and update both Site URL and Home URL to https://. Update any hardcoded http URLs in content via a search-replace tool such as WP-CLI\'s `wp search-replace`.', 'preflight-wp' )
+			);
+		}
+
+		return PreFlight_Check_Result::pass();
 	}
 
 	/**
 	 * Fail when readme.html exists in the WordPress webroot.
 	 *
+	 * Loopback HTTP requests are forbidden (Brief §5.2), so PreFlight cannot
+	 * verify the file is HTTP-accessible — the message notes this limitation.
+	 * The file existence check is sufficient as a deployment gate: on a
+	 * correctly configured server the file will be publicly reachable if it
+	 * exists.
+	 *
 	 * @since 0.4.0
 	 * @return PreFlight_Check_Result
 	 */
 	public function check_readme_html(): PreFlight_Check_Result {
-		return PreFlight_Check_Result::skip( 'not yet implemented' );
+		if ( file_exists( ABSPATH . 'readme.html' ) ) {
+			return PreFlight_Check_Result::fail(
+				__( 'readme.html exists in the WordPress root. PreFlight cannot verify HTTP accessibility without loopback (Phase 5); this file exposes the WordPress version to anyone who fetches it.', 'preflight-wp' ),
+				__( 'Delete readme.html from the WordPress root, or block public access at the server level (e.g., an Nginx location block or .htaccess deny rule).', 'preflight-wp' )
+			);
+		}
+
+		return PreFlight_Check_Result::pass();
 	}
 
 	/**
