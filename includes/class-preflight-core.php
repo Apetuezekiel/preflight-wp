@@ -41,6 +41,7 @@ class PreFlight_Core {
 		require_once PREFLIGHT_PATH . 'includes/class-preflight-check.php';
 		require_once PREFLIGHT_PATH . 'includes/checks/class-checks-wp-config.php';
 		require_once PREFLIGHT_PATH . 'includes/checks/class-checks-content.php';
+		require_once PREFLIGHT_PATH . 'includes/checks/class-checks-seo.php';
 		do_action( 'preflight_register_categories', $this );
 	}
 
