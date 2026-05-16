@@ -170,21 +170,57 @@ class PreFlight_Checks_Security implements PreFlight_Check_Category {
 	/**
 	 * Fail when wp-config backup files are found in the webroot.
 	 *
+	 * Checks against CONFIG_BACKUP_FILENAMES. Each found filename is included
+	 * in the fail message so the developer knows exactly what to remove.
+	 *
 	 * @since 0.4.0
 	 * @return PreFlight_Check_Result
 	 */
 	public function check_config_backups(): PreFlight_Check_Result {
-		return PreFlight_Check_Result::skip( 'not yet implemented' );
+		$found = array();
+
+		foreach ( self::CONFIG_BACKUP_FILENAMES as $filename ) {
+			if ( file_exists( ABSPATH . $filename ) ) {
+				$found[] = $filename;
+			}
+		}
+
+		if ( ! empty( $found ) ) {
+			return PreFlight_Check_Result::fail(
+				sprintf(
+					/* translators: %s: comma-separated list of found backup filenames */
+					__( 'Backup or temporary copies of wp-config.php exist in the WordPress root: %s. These may expose database credentials if HTTP-accessible.', 'preflight-wp' ),
+					implode( ', ', $found )
+				),
+				__( 'Delete the listed files, or move them outside the webroot. Never leave wp-config backups in a publicly-served directory.', 'preflight-wp' )
+			);
+		}
+
+		return PreFlight_Check_Result::pass();
 	}
 
 	/**
-	 * Fail when XML-RPC is enabled via the xmlrpc_enabled filter.
+	 * Fail when XML-RPC is enabled.
+	 *
+	 * apply_filters('xmlrpc_enabled', true) is the canonical signal — directly
+	 * reading a constant or option misses cases where plugins toggle it via
+	 * the filter. The initial value of true reflects WordPress core's default
+	 * (XML-RPC enabled unless a plugin hooks in to disable it).
 	 *
 	 * @since 0.4.0
 	 * @return PreFlight_Check_Result
 	 */
 	public function check_xmlrpc(): PreFlight_Check_Result {
-		return PreFlight_Check_Result::skip( 'not yet implemented' );
+		$enabled = apply_filters( 'xmlrpc_enabled', true );
+
+		if ( true === $enabled ) {
+			return PreFlight_Check_Result::fail(
+				__( 'XML-RPC is enabled. While not inherently a vulnerability, XML-RPC has historically been used for brute-force and DDoS amplification.', 'preflight-wp' ),
+				__( 'If the site does not use XML-RPC (Jetpack, WordPress mobile apps, some IFTTT recipes, third-party publishing tools), disable it via a plugin or via `add_filter(\'xmlrpc_enabled\', \'__return_false\');` in a small mu-plugin.', 'preflight-wp' )
+			);
+		}
+
+		return PreFlight_Check_Result::pass();
 	}
 
 	/**
