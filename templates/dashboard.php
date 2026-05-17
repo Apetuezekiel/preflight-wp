@@ -205,7 +205,9 @@ $is_historical = isset( $is_historical ) ? (bool) $is_historical : false;
 				<span class="preflight-category__chevron" aria-hidden="true"></span>
 				<span class="preflight-category__label"><?php echo esc_html( $label ); ?></span>
 				<?php if ( $fail_count > 0 ) : ?>
-					<span class="preflight-category__badge" aria-label="<?php echo esc_attr( sprintf( _n( '%d issue', '%d issues', $fail_count, 'preflight-wp' ), $fail_count ) ); ?>">
+					<span class="preflight-category__badge" aria-label="<?php
+					/* translators: %d: number of failing checks in this category */
+					echo esc_attr( sprintf( _n( '%d issue', '%d issues', $fail_count, 'preflight-wp' ), $fail_count ) ); ?>">
 						<?php echo absint( $fail_count ); ?>
 					</span>
 				<?php endif; ?>

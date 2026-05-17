@@ -178,8 +178,8 @@ class PreFlight_Checks_Plugins implements PreFlight_Check_Category {
 
 		return PreFlight_Check_Result::fail(
 			sprintf(
-				/* translators: %s: comma-separated list of plugin names with available updates */
-				__( '%d plugin(s) have updates available: %s.', 'preflight-wp' ),
+				/* translators: 1: number of plugins with available updates, 2: comma-separated list of plugin names */
+				__( '%1$d plugin(s) have updates available: %2$s.', 'preflight-wp' ),
 				count( $updates ),
 				implode( ', ', $names )
 			),
