@@ -17,6 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- template-scoped variables injected by render_dashboard_partial().
 $is_historical = isset( $is_historical ) ? (bool) $is_historical : false;
 ?>
 <div id="preflight-dashboard">

@@ -132,7 +132,7 @@ class PreFlight_Checks_Security implements PreFlight_Check_Category {
 	 * @return PreFlight_Check_Result
 	 */
 	public function check_ssl(): PreFlight_Check_Result {
-		$scheme = parse_url( home_url(), PHP_URL_SCHEME );
+		$scheme = wp_parse_url( home_url(), PHP_URL_SCHEME );
 
 		if ( 'https' !== $scheme ) {
 			return PreFlight_Check_Result::fail(
@@ -211,7 +211,7 @@ class PreFlight_Checks_Security implements PreFlight_Check_Category {
 	 * @return PreFlight_Check_Result
 	 */
 	public function check_xmlrpc(): PreFlight_Check_Result {
-		$enabled = apply_filters( 'xmlrpc_enabled', true );
+		$enabled = apply_filters( 'xmlrpc_enabled', true ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- core WP hook, not registered by this plugin.
 
 		if ( true === $enabled ) {
 			return PreFlight_Check_Result::fail(

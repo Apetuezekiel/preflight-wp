@@ -134,7 +134,7 @@ class PreFlight_Admin {
 		// Collect checked (enabled) check IDs from the POST.
 		// sanitize_check_ids() whitelists against the live registry — sanitize_key() must
 		// NOT be used here because it strips dots, and check IDs use dot notation.
-		$raw_enabled = isset( $_POST['enabled_checks'] ) ? (array) $_POST['enabled_checks'] : array();
+		$raw_enabled = isset( $_POST['enabled_checks'] ) ? (array) wp_unslash( $_POST['enabled_checks'] ) : array(); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 		$enabled     = $this->sanitize_check_ids( $raw_enabled );
 
 		// Disabled = all known - enabled (unchecked boxes are not submitted by browser).
@@ -142,9 +142,9 @@ class PreFlight_Admin {
 
 		// Sanitize developer_info fields.
 		$dev_info = array(
-			'name'  => sanitize_text_field( $_POST['developer_name'] ?? '' ),
-			'email' => sanitize_email( $_POST['developer_email'] ?? '' ),
-			'url'   => esc_url_raw( $_POST['developer_url'] ?? '' ),
+			'name'  => sanitize_text_field( wp_unslash( $_POST['developer_name'] ?? '' ) ),
+			'email' => sanitize_email( wp_unslash( $_POST['developer_email'] ?? '' ) ),
+			'url'   => esc_url_raw( wp_unslash( $_POST['developer_url'] ?? '' ) ),
 		);
 
 		$settings = array(
@@ -280,7 +280,7 @@ class PreFlight_Admin {
 	 */
 	private function get_active_tab(): string {
 		$allowed = array( 'dashboard', 'history', 'settings' );
-		$tab     = isset( $_GET['tab'] ) ? sanitize_key( $_GET['tab'] ) : 'dashboard';
+		$tab     = isset( $_GET['tab'] ) ? sanitize_key( $_GET['tab'] ) : 'dashboard'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		return in_array( $tab, $allowed, true ) ? $tab : 'dashboard';
 	}
 
@@ -316,10 +316,10 @@ class PreFlight_Admin {
 		$history      = $this->history->get_all();
 		$is_historical = false;
 
-		$raw_index = isset( $_GET['scan_index'] ) ? $_GET['scan_index'] : null;
+		$raw_index = isset( $_GET['scan_index'] ) ? absint( wp_unslash( $_GET['scan_index'] ) ) : null; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
 		if ( null !== $raw_index ) {
-			$scan_index = absint( $raw_index );
+			$scan_index = $raw_index;
 
 			if ( isset( $history[ $scan_index ] ) ) {
 				// Valid historical scan. Delta compares this scan against the next-older
@@ -354,7 +354,7 @@ class PreFlight_Admin {
 		}
 
 		// Success notice after synchronous scan.
-		if ( isset( $_GET['scanned'] ) && '1' === $_GET['scanned'] ) {
+		if ( isset( $_GET['scanned'] ) && '1' === $_GET['scanned'] ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			echo '<div class="notice notice-success is-dismissible"><p>' . esc_html__( 'Scan complete.', 'preflight-wp' ) . '</p></div>';
 		}
 
@@ -447,7 +447,7 @@ class PreFlight_Admin {
 	 * @since  0.3.0
 	 */
 	private function render_settings_tab(): void {
-		if ( isset( $_GET['updated'] ) && '1' === $_GET['updated'] ) {
+		if ( isset( $_GET['updated'] ) && '1' === $_GET['updated'] ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			echo '<div class="notice notice-success is-dismissible"><p>' . esc_html__( 'Settings saved.', 'preflight-wp' ) . '</p></div>';
 		}
 

@@ -147,7 +147,7 @@ class PreFlight_Checks_WP_Config implements PreFlight_Check_Category {
 	 */
 	public function check_default_tagline(): PreFlight_Check_Result {
 		$current = trim( get_bloginfo( 'description' ) );
-		$default = trim( __( 'Just another WordPress site' ) ); // Intentionally no text domain — matches WP core string.
+		$default = trim( __( 'Just another WordPress site' ) ); // phpcs:ignore WordPress.WP.I18n.MissingArgDomain -- intentionally matches WP core string, no plugin domain.
 
 		if ( $current === $default ) {
 			return PreFlight_Check_Result::fail(

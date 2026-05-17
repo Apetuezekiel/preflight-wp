@@ -18,6 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- template-scoped variables injected by the calling render method.
 $disabled_checks = isset( $settings['disabled_checks'] ) ? (array) $settings['disabled_checks'] : array();
 $dev_info        = isset( $settings['developer_info'] ) ? (array) $settings['developer_info'] : array();
 $form_action     = admin_url( 'tools.php?page=preflight&tab=settings' );

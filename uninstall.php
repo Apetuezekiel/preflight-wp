@@ -13,7 +13,9 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 }
 
 if ( is_multisite() ) {
+	// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound
 	$sites = get_sites( array( 'number' => 0 ) );
+	// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound
 	foreach ( $sites as $site ) {
 		switch_to_blog( $site->blog_id );
 		delete_option( 'preflight_settings' );

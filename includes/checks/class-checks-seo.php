@@ -188,7 +188,7 @@ class PreFlight_Checks_SEO implements PreFlight_Check_Category {
 		}
 
 		// Core sitemap generator enabled (default WordPress 5.5+ behaviour).
-		if ( true === apply_filters( 'wp_sitemaps_enabled', true ) ) {
+		if ( true === apply_filters( 'wp_sitemaps_enabled', true ) ) { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- core WP hook, not registered by this plugin.
 			return PreFlight_Check_Result::pass();
 		}
 

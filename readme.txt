@@ -4,7 +4,7 @@ Tags:              pre-launch, qa, checklist, scanner, launch
 Requires at least: 6.0
 Tested up to:      6.9
 Requires PHP:      7.4
-Stable tag:        0.1.0
+Stable tag:        1.0.0
 License:           GPLv2 or later
 License URI:       https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -81,6 +81,14 @@ The plugin scans the site it is activated on. Network-wide scanning across all s
 2. Settings page — enable or disable individual checks; optional developer info for future report export.
 
 == Changelog ==
+
+= 1.0.0 =
+* First stable release. 35 checks across 7 categories (WordPress Configuration, Content & Appearance, Security Basics, SEO Readiness, Forms & Communication, Performance Basics, Plugin Hygiene).
+* Admin UI: Dashboard, History, and Settings tabs under Tools → PreFlight.
+* Scan history: last 10 scans stored locally with new/resolved/unchanged delta comparison.
+* WCAG AA–compliant interface with WAI-ARIA disclosure pattern for collapsible check groups.
+* i18n-ready: 180 translatable strings, .pot template included.
+* All detection uses internal WordPress APIs — no external HTTP requests, no data leaves your server.
 
 = 0.1.0 =
 * Plugin bootstrap: directory structure, interfaces, core singleton, and uninstall handler. Not yet functional — no checks implemented.
