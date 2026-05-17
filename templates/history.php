@@ -57,21 +57,29 @@ if ( ! defined( 'ABSPATH' ) ) {
 				data-drill-url="<?php echo esc_url( $drill_url ); ?>"
 				tabindex="0"
 				role="link"
-				aria-label="<?php echo esc_attr( sprintf( __( 'View scan from %s', 'preflight-wp' ), $date_str ) ); ?>"
+				aria-label="<?php
+				/* translators: %s: scan date and time string */
+				echo esc_attr( sprintf( __( 'View scan from %s', 'preflight-wp' ), $date_str ) ); ?>"
 			>
 				<td><?php echo esc_html( $date_str ); ?><?php if ( 0 === $index ) : ?> <em>(<?php esc_html_e( 'latest', 'preflight-wp' ); ?>)</em><?php endif; ?></td>
 				<td class="preflight-col-severity">
-					<span class="preflight-severity-pill preflight-severity-pill--blocker" aria-label="<?php echo esc_attr( sprintf( __( '%d blockers', 'preflight-wp' ), $summary['blockers'] ) ); ?>">
+					<span class="preflight-severity-pill preflight-severity-pill--blocker" aria-label="<?php
+					/* translators: %d: number of blocker-severity issues in this scan */
+					echo esc_attr( sprintf( __( '%d blockers', 'preflight-wp' ), $summary['blockers'] ) ); ?>">
 						<?php echo absint( $summary['blockers'] ); ?>
 					</span>
 				</td>
 				<td class="preflight-col-severity">
-					<span class="preflight-severity-pill preflight-severity-pill--warning" aria-label="<?php echo esc_attr( sprintf( __( '%d warnings', 'preflight-wp' ), $summary['warnings'] ) ); ?>">
+					<span class="preflight-severity-pill preflight-severity-pill--warning" aria-label="<?php
+					/* translators: %d: number of warning-severity issues in this scan */
+					echo esc_attr( sprintf( __( '%d warnings', 'preflight-wp' ), $summary['warnings'] ) ); ?>">
 						<?php echo absint( $summary['warnings'] ); ?>
 					</span>
 				</td>
 				<td class="preflight-col-severity">
-					<span class="preflight-severity-pill preflight-severity-pill--info" aria-label="<?php echo esc_attr( sprintf( __( '%d info', 'preflight-wp' ), $summary['info'] ) ); ?>">
+					<span class="preflight-severity-pill preflight-severity-pill--info" aria-label="<?php
+					/* translators: %d: number of info-severity issues in this scan */
+					echo esc_attr( sprintf( __( '%d info', 'preflight-wp' ), $summary['info'] ) ); ?>">
 						<?php echo absint( $summary['info'] ); ?>
 					</span>
 				</td>
