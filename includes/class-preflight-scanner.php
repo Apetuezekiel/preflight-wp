@@ -311,7 +311,7 @@ class PreFlight_Scanner {
 			wp_raise_memory_limit( 'admin' );
 		}
 		if ( function_exists( 'set_time_limit' ) ) {
-			// phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+			// phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged, Squiz.PHP.DiscouragedFunctions.Discouraged
 			@set_time_limit( 60 );
 		}
 	}

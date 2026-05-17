@@ -76,6 +76,7 @@ class PreFlight_Configurable_Check implements PreFlight_Check {
 	public function run(): PreFlight_Check_Result {
 		$result = ( $this->runner )();
 		if ( ! ( $result instanceof PreFlight_Check_Result ) ) {
+			// phpcs:disable WordPress.Security.EscapeOutput.ExceptionNotEscaped -- args are internal check ID and PHP type name, not user input.
 			throw new \TypeError(
 				sprintf(
 					'Check runner for "%s" must return PreFlight_Check_Result, got %s.',
@@ -83,6 +84,7 @@ class PreFlight_Configurable_Check implements PreFlight_Check {
 					gettype( $result )
 				)
 			);
+			// phpcs:enable WordPress.Security.EscapeOutput.ExceptionNotEscaped
 		}
 		return $result;
 	}
