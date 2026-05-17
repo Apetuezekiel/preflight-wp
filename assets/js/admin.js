@@ -8,53 +8,6 @@
 
 document.addEventListener( 'DOMContentLoaded', function () {
 
-	// -------------------------------------------------------------------------
-	// Category expand / collapse
-	// -------------------------------------------------------------------------
-
-	var headers = document.querySelectorAll( '.preflight-category__header' );
-
-	function toggleCategory( header ) {
-		var section  = header.closest( '.preflight-category' );
-		var expanded = section.classList.contains( 'is-expanded' );
-		var bodyId   = header.getAttribute( 'aria-controls' );
-		var body     = bodyId ? document.getElementById( bodyId ) : null;
-
-		if ( expanded ) {
-			section.classList.remove( 'is-expanded' );
-			header.setAttribute( 'aria-expanded', 'false' );
-			if ( body ) {
-				body.style.display = 'none';
-			}
-		} else {
-			section.classList.add( 'is-expanded' );
-			header.setAttribute( 'aria-expanded', 'true' );
-			if ( body ) {
-				body.style.display = '';
-			}
-		}
-	}
-
-	for ( var i = 0; i < headers.length; i++ ) {
-		( function ( header ) {
-			header.addEventListener( 'click', function () {
-				toggleCategory( header );
-			} );
-
-			header.addEventListener( 'keydown', function ( e ) {
-				if ( e.key === 'Enter' || e.key === ' ' ) {
-					e.preventDefault();
-					toggleCategory( header );
-				}
-			} );
-		} )( headers[ i ] );
-	}
-
-	// -------------------------------------------------------------------------
-	// AJAX rescan — delegated to stable #preflight-dashboard parent so the
-	// listener survives innerHTML replacement after each scan.
-	// -------------------------------------------------------------------------
-
 	var statusEl  = document.getElementById( 'preflight-status' );
 	var dashboard = document.getElementById( 'preflight-dashboard' );
 
@@ -62,13 +15,55 @@ document.addEventListener( 'DOMContentLoaded', function () {
 		return;
 	}
 
+	// -------------------------------------------------------------------------
+	// Category expand / collapse — delegated to #preflight-dashboard so it
+	// survives innerHTML replacement after each AJAX rescan.
+	// Keyboard (Enter / Space) is handled natively by the <button> element;
+	// no custom keydown handler needed.
+	// -------------------------------------------------------------------------
+
+	function toggleCategory( toggle ) {
+		var section  = toggle.closest( '.preflight-category' );
+		var expanded = section.classList.contains( 'is-expanded' );
+		var bodyId   = toggle.getAttribute( 'aria-controls' );
+		var body     = bodyId ? document.getElementById( bodyId ) : null;
+
+		if ( expanded ) {
+			section.classList.remove( 'is-expanded' );
+			toggle.setAttribute( 'aria-expanded', 'false' );
+			if ( body ) {
+				body.style.display = 'none';
+			}
+		} else {
+			section.classList.add( 'is-expanded' );
+			toggle.setAttribute( 'aria-expanded', 'true' );
+			if ( body ) {
+				body.style.display = '';
+			}
+		}
+	}
+
+	// -------------------------------------------------------------------------
+	// Delegated click handler — covers category toggles AND the AJAX rescan
+	// button. Both targets survive innerHTML replacement because the listener
+	// is on the stable #preflight-dashboard parent.
+	// -------------------------------------------------------------------------
+
 	dashboard.addEventListener( 'click', function ( e ) {
+
+		// Category expand / collapse.
+		var toggle = e.target.closest( '.preflight-category__toggle' );
+		if ( toggle ) {
+			toggleCategory( toggle );
+			return;
+		}
+
+		// AJAX rescan.
 		var btn = e.target.closest( '#preflight-rescan-btn' );
 		if ( ! btn ) {
 			return;
 		}
 
-		// Only intercept if fetch is available.
 		if ( typeof fetch === 'undefined' ) {
 			return;
 		}
@@ -98,21 +93,6 @@ document.addEventListener( 'DOMContentLoaded', function () {
 			if ( data.success && data.data && data.data.html_partial ) {
 				dashboard.innerHTML = data.data.html_partial;
 
-				// Re-attach collapse behaviour to newly injected headers.
-				// (The rescan-btn delegation on dashboard survives automatically.)
-				var newHeaders = dashboard.querySelectorAll( '.preflight-category__header' );
-				for ( var j = 0; j < newHeaders.length; j++ ) {
-					( function ( h ) {
-						h.addEventListener( 'click', function () { toggleCategory( h ); } );
-						h.addEventListener( 'keydown', function ( ev ) {
-							if ( ev.key === 'Enter' || ev.key === ' ' ) {
-								ev.preventDefault();
-								toggleCategory( h );
-							}
-						} );
-					} )( newHeaders[ j ] );
-				}
-
 				if ( statusEl ) {
 					statusEl.textContent = 'Scan complete.';
 				}
@@ -124,7 +104,6 @@ document.addEventListener( 'DOMContentLoaded', function () {
 			showError( dashboard );
 		} )
 		.finally( function () {
-			// btn may be gone if the DOM was replaced; re-query by ID.
 			var newBtn = document.getElementById( 'preflight-rescan-btn' );
 			if ( newBtn ) {
 				newBtn.disabled    = false;

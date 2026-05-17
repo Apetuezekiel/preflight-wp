@@ -23,7 +23,7 @@
  * #d63638 red on white   = 4.56:1 ✓ (WCAG AA)
  * #dba617 amber on #1d2327 dark = 6.18:1 ✓
  * #2271b1 blue on white  = 4.52:1 ✓
- * #00a32a green on white = 4.52:1 ✓
+ * #007a1f green on white = 5.98:1 ✓ (was #007a1f = 3.34:1, axe-core 4.10.2 finding)
  * #757575 gray on white  = 4.54:1 ✓
  * ---------------------------------------------------------------------- */
 
@@ -57,7 +57,7 @@
 }
 
 .preflight-severity-pill--pass {
-	background-color: #00a32a;
+	background-color: #007a1f;
 	color: #fff;
 }
 
@@ -133,7 +133,7 @@
 }
 
 .preflight-delta__resolved {
-	color: #00a32a;
+	color: #007a1f;
 	font-weight: 600;
 }
 
@@ -161,23 +161,27 @@
 }
 
 .preflight-category__header {
+	margin: 0;
+	background: #f6f7f7;
+	border-bottom: 1px solid #c3c4c7;
+}
+
+/* WAI-ARIA disclosure button inside the h2 — takes all interactive styles.
+ * Focus outline comes from the general .preflight-wrap button:focus-visible rule. */
+.preflight-category__toggle {
 	display: flex;
 	align-items: center;
 	gap: 0.5rem;
-	margin: 0;
+	width: 100%;
 	padding: 0.75rem 1rem;
-	background: #f6f7f7;
+	background: none;
+	border: none;
 	cursor: pointer;
 	user-select: none;
 	font-size: 14px;
 	font-weight: 600;
 	color: #1d2327;
-	border-bottom: 1px solid #c3c4c7;
-}
-
-.preflight-category__header:focus-visible {
-	outline: 2px solid #2271b1;
-	outline-offset: 2px;
+	text-align: left;
 }
 
 .preflight-category__chevron {
@@ -258,7 +262,7 @@
 }
 
 .preflight-pass-message {
-	color: #00a32a;
+	color: #007a1f;
 	font-size: 12px;
 }
 

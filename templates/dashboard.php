@@ -194,23 +194,24 @@ $is_historical = isset( $is_historical ) ? (bool) $is_historical : false;
 		$label      = isset( $category_labels[ $cat_id ] ) ? $category_labels[ $cat_id ] : $cat_id;
 	?>
 		<section class="preflight-category is-expanded" id="<?php echo esc_attr( $section_id . '-section' ); ?>">
-			<h2
-				class="preflight-category__header"
-				id="<?php echo esc_attr( $section_id . '-header' ); ?>"
-				tabindex="0"
-				role="button"
-				aria-expanded="true"
-				aria-controls="<?php echo esc_attr( $section_id . '-body' ); ?>"
-			>
-				<span class="preflight-category__chevron" aria-hidden="true"></span>
-				<span class="preflight-category__label"><?php echo esc_html( $label ); ?></span>
-				<?php if ( $fail_count > 0 ) : ?>
-					<span class="preflight-category__badge" aria-label="<?php
-					/* translators: %d: number of failing checks in this category */
-					echo esc_attr( sprintf( _n( '%d issue', '%d issues', $fail_count, 'preflight-wp' ), $fail_count ) ); ?>">
-						<?php echo absint( $fail_count ); ?>
-					</span>
-				<?php endif; ?>
+			<h2 class="preflight-category__header">
+				<button
+					type="button"
+					class="preflight-category__toggle"
+					id="<?php echo esc_attr( $section_id . '-header' ); ?>"
+					aria-expanded="true"
+					aria-controls="<?php echo esc_attr( $section_id . '-body' ); ?>"
+				>
+					<span class="preflight-category__chevron" aria-hidden="true"></span>
+					<span class="preflight-category__label"><?php echo esc_html( $label ); ?></span>
+					<?php if ( $fail_count > 0 ) : ?>
+						<span class="preflight-category__badge" aria-label="<?php
+						/* translators: %d: number of failing checks in this category */
+						echo esc_attr( sprintf( _n( '%d issue', '%d issues', $fail_count, 'preflight-wp' ), $fail_count ) ); ?>">
+							<?php echo absint( $fail_count ); ?>
+						</span>
+					<?php endif; ?>
+				</button>
 			</h2>
 			<div
 				class="preflight-category__body"
