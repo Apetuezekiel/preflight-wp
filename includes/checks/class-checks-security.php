@@ -2,7 +2,7 @@
 /**
  * Security Basics check category — 6 checks per Brief §3.2.
  *
- * @package PreFlight
+ * @package Prelaunch_Checker
  * @since   0.4.0
  */
 
@@ -22,12 +22,12 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 0.4.0
  */
-class PreFlight_Checks_Security implements PreFlight_Check_Category {
+class Prelaunch_Checker_Checks_Security implements Prelaunch_Checker_Check_Category {
 
 	/**
 	 * Filenames checked for wp-config backup copies in the webroot.
 	 *
-	 * Extension point (v1.1): a filter hook 'preflight_config_backup_filenames'
+	 * Extension point (v1.1): a filter hook 'prelaunch_checker_config_backup_filenames'
 	 * will be added here when custom filename overrides are implemented. Do not
 	 * add the filter now; document the intent only.
 	 *
@@ -43,7 +43,7 @@ class PreFlight_Checks_Security implements PreFlight_Check_Category {
 	);
 
 	// -------------------------------------------------------------------------
-	// PreFlight_Check_Category interface
+	// Prelaunch_Checker_Check_Category interface
 	// -------------------------------------------------------------------------
 
 	/**
@@ -57,7 +57,7 @@ class PreFlight_Checks_Security implements PreFlight_Check_Category {
 	 * @return string
 	 */
 	public function get_category_label(): string {
-		return __( 'Security Basics', 'preflight-wp' );
+		return __( 'Security Basics', 'prelaunch-checker' );
 	}
 
 	/**
@@ -76,14 +76,14 @@ class PreFlight_Checks_Security implements PreFlight_Check_Category {
 	 * Return a check object for the given ID, or null if the ID is unknown.
 	 *
 	 * @param string $id Namespaced check ID.
-	 * @return PreFlight_Check|null
+	 * @return Prelaunch_Checker_Check|null
 	 */
-	public function get_check( string $id ): ?PreFlight_Check {
+	public function get_check( string $id ): ?Prelaunch_Checker_Check {
 		foreach ( self::get_spec() as $entry ) {
 			if ( $entry[0] !== $id ) {
 				continue;
 			}
-			return new PreFlight_Configurable_Check(
+			return new Prelaunch_Checker_Configurable_Check(
 				$entry[0],
 				$entry[1],
 				$entry[2],
@@ -107,12 +107,12 @@ class PreFlight_Checks_Security implements PreFlight_Check_Category {
 	 */
 	private static function get_spec(): array {
 		return array(
-			array( 'security.ssl-not-active',            __( 'SSL / HTTPS configuration',     'preflight-wp' ), PREFLIGHT_SEVERITY_BLOCKER, 'check_ssl' ),
-			array( 'security.config-backups-in-webroot', __( 'wp-config backup files',        'preflight-wp' ), PREFLIGHT_SEVERITY_WARNING, 'check_config_backups' ),
-			array( 'security.default-table-prefix',      __( 'Database table prefix',         'preflight-wp' ), PREFLIGHT_SEVERITY_INFO,    'check_table_prefix' ),
-			array( 'security.file-editing-enabled',      __( 'Theme/plugin file editing',     'preflight-wp' ), PREFLIGHT_SEVERITY_INFO,    'check_file_editing' ),
-			array( 'security.readme-html-accessible',    __( 'readme.html in webroot',        'preflight-wp' ), PREFLIGHT_SEVERITY_INFO,    'check_readme_html' ),
-			array( 'security.xmlrpc-enabled',            __( 'XML-RPC enabled',               'preflight-wp' ), PREFLIGHT_SEVERITY_INFO,    'check_xmlrpc' ),
+			array( 'security.ssl-not-active',            __( 'SSL / HTTPS configuration',     'prelaunch-checker' ), PRELAUNCH_CHECKER_SEVERITY_BLOCKER, 'check_ssl' ),
+			array( 'security.config-backups-in-webroot', __( 'wp-config backup files',        'prelaunch-checker' ), PRELAUNCH_CHECKER_SEVERITY_WARNING, 'check_config_backups' ),
+			array( 'security.default-table-prefix',      __( 'Database table prefix',         'prelaunch-checker' ), PRELAUNCH_CHECKER_SEVERITY_INFO,    'check_table_prefix' ),
+			array( 'security.file-editing-enabled',      __( 'Theme/plugin file editing',     'prelaunch-checker' ), PRELAUNCH_CHECKER_SEVERITY_INFO,    'check_file_editing' ),
+			array( 'security.readme-html-accessible',    __( 'readme.html in webroot',        'prelaunch-checker' ), PRELAUNCH_CHECKER_SEVERITY_INFO,    'check_readme_html' ),
+			array( 'security.xmlrpc-enabled',            __( 'XML-RPC enabled',               'prelaunch-checker' ), PRELAUNCH_CHECKER_SEVERITY_INFO,    'check_xmlrpc' ),
 		);
 	}
 
@@ -129,42 +129,42 @@ class PreFlight_Checks_Security implements PreFlight_Check_Category {
 	 * The pre-launch signal is whether the stored Home URL uses https.
 	 *
 	 * @since 0.4.0
-	 * @return PreFlight_Check_Result
+	 * @return Prelaunch_Checker_Check_Result
 	 */
-	public function check_ssl(): PreFlight_Check_Result {
-		$scheme = parse_url( home_url(), PHP_URL_SCHEME );
+	public function check_ssl(): Prelaunch_Checker_Check_Result {
+		$scheme = wp_parse_url( home_url(), PHP_URL_SCHEME );
 
 		if ( 'https' !== $scheme ) {
-			return PreFlight_Check_Result::fail(
-				__( 'Site is not configured for HTTPS — Site Address uses an http scheme.', 'preflight-wp' ),
-				__( 'Install an SSL certificate (most hosts offer free Let\'s Encrypt). Then go to Settings → General and update both Site URL and Home URL to https://. Update any hardcoded http URLs in content via a search-replace tool such as WP-CLI\'s `wp search-replace`.', 'preflight-wp' )
+			return Prelaunch_Checker_Check_Result::fail(
+				__( 'Site is not configured for HTTPS; Site Address uses an http scheme.', 'prelaunch-checker' ),
+				__( 'Install an SSL certificate (most hosts offer free Let\'s Encrypt). Then go to Settings → General and update both Site URL and Home URL to https://. Update any hardcoded http URLs in content via a search-replace tool such as WP-CLI\'s `wp search-replace`.', 'prelaunch-checker' )
 			);
 		}
 
-		return PreFlight_Check_Result::pass();
+		return Prelaunch_Checker_Check_Result::pass();
 	}
 
 	/**
 	 * Fail when readme.html exists in the WordPress webroot.
 	 *
-	 * Loopback HTTP requests are forbidden (Brief §5.2), so PreFlight cannot
+	 * Loopback HTTP requests are forbidden (Brief §5.2), so Prelaunch Checker cannot
 	 * verify the file is HTTP-accessible — the message notes this limitation.
 	 * The file existence check is sufficient as a deployment gate: on a
 	 * correctly configured server the file will be publicly reachable if it
 	 * exists.
 	 *
 	 * @since 0.4.0
-	 * @return PreFlight_Check_Result
+	 * @return Prelaunch_Checker_Check_Result
 	 */
-	public function check_readme_html(): PreFlight_Check_Result {
+	public function check_readme_html(): Prelaunch_Checker_Check_Result {
 		if ( file_exists( ABSPATH . 'readme.html' ) ) {
-			return PreFlight_Check_Result::fail(
-				__( 'readme.html exists in the WordPress root. PreFlight cannot verify HTTP accessibility without loopback (Phase 5); this file exposes the WordPress version to anyone who fetches it.', 'preflight-wp' ),
-				__( 'Delete readme.html from the WordPress root, or block public access at the server level (e.g., an Nginx location block or .htaccess deny rule).', 'preflight-wp' )
+			return Prelaunch_Checker_Check_Result::fail(
+				__( 'readme.html exists in the WordPress root. Prelaunch Checker cannot verify HTTP accessibility without loopback (Phase 5); this file exposes the WordPress version to anyone who fetches it.', 'prelaunch-checker' ),
+				__( 'Delete readme.html from the WordPress root, or block public access at the server level (e.g., an Nginx location block or .htaccess deny rule).', 'prelaunch-checker' )
 			);
 		}
 
-		return PreFlight_Check_Result::pass();
+		return Prelaunch_Checker_Check_Result::pass();
 	}
 
 	/**
@@ -174,9 +174,9 @@ class PreFlight_Checks_Security implements PreFlight_Check_Category {
 	 * in the fail message so the developer knows exactly what to remove.
 	 *
 	 * @since 0.4.0
-	 * @return PreFlight_Check_Result
+	 * @return Prelaunch_Checker_Check_Result
 	 */
-	public function check_config_backups(): PreFlight_Check_Result {
+	public function check_config_backups(): Prelaunch_Checker_Check_Result {
 		$found = array();
 
 		foreach ( self::CONFIG_BACKUP_FILENAMES as $filename ) {
@@ -186,17 +186,17 @@ class PreFlight_Checks_Security implements PreFlight_Check_Category {
 		}
 
 		if ( ! empty( $found ) ) {
-			return PreFlight_Check_Result::fail(
+			return Prelaunch_Checker_Check_Result::fail(
 				sprintf(
 					/* translators: %s: comma-separated list of found backup filenames */
-					__( 'Backup or temporary copies of wp-config.php exist in the WordPress root: %s. These may expose database credentials if HTTP-accessible.', 'preflight-wp' ),
+					__( 'Backup or temporary copies of wp-config.php exist in the WordPress root: %s. These may expose database credentials if HTTP-accessible.', 'prelaunch-checker' ),
 					implode( ', ', $found )
 				),
-				__( 'Delete the listed files, or move them outside the webroot. Never leave wp-config backups in a publicly-served directory.', 'preflight-wp' )
+				__( 'Delete the listed files, or move them outside the webroot. Never leave wp-config backups in a publicly-served directory.', 'prelaunch-checker' )
 			);
 		}
 
-		return PreFlight_Check_Result::pass();
+		return Prelaunch_Checker_Check_Result::pass();
 	}
 
 	/**
@@ -208,19 +208,19 @@ class PreFlight_Checks_Security implements PreFlight_Check_Category {
 	 * (XML-RPC enabled unless a plugin hooks in to disable it).
 	 *
 	 * @since 0.4.0
-	 * @return PreFlight_Check_Result
+	 * @return Prelaunch_Checker_Check_Result
 	 */
-	public function check_xmlrpc(): PreFlight_Check_Result {
-		$enabled = apply_filters( 'xmlrpc_enabled', true );
+	public function check_xmlrpc(): Prelaunch_Checker_Check_Result {
+		$enabled = apply_filters( 'xmlrpc_enabled', true ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- core WP hook, not registered by this plugin.
 
 		if ( true === $enabled ) {
-			return PreFlight_Check_Result::fail(
-				__( 'XML-RPC is enabled. While not inherently a vulnerability, XML-RPC has historically been used for brute-force and DDoS amplification.', 'preflight-wp' ),
-				__( 'If the site does not use XML-RPC (Jetpack, WordPress mobile apps, some IFTTT recipes, third-party publishing tools), disable it via a plugin or via `add_filter(\'xmlrpc_enabled\', \'__return_false\');` in a small mu-plugin.', 'preflight-wp' )
+			return Prelaunch_Checker_Check_Result::fail(
+				__( 'XML-RPC is enabled. While not inherently a vulnerability, XML-RPC has historically been used for brute-force and DDoS amplification.', 'prelaunch-checker' ),
+				__( 'If the site does not use XML-RPC (Jetpack, WordPress mobile apps, some IFTTT recipes, third-party publishing tools), disable it via a plugin or via `add_filter(\'xmlrpc_enabled\', \'__return_false\');` in a small mu-plugin.', 'prelaunch-checker' )
 			);
 		}
 
-		return PreFlight_Check_Result::pass();
+		return Prelaunch_Checker_Check_Result::pass();
 	}
 
 	/**
@@ -230,17 +230,17 @@ class PreFlight_Checks_Security implements PreFlight_Check_Category {
 	 * undefined or set to false/any other value, the editors are accessible.
 	 *
 	 * @since 0.4.0
-	 * @return PreFlight_Check_Result
+	 * @return Prelaunch_Checker_Check_Result
 	 */
-	public function check_file_editing(): PreFlight_Check_Result {
+	public function check_file_editing(): Prelaunch_Checker_Check_Result {
 		if ( ! defined( 'DISALLOW_FILE_EDIT' ) || true !== DISALLOW_FILE_EDIT ) {
-			return PreFlight_Check_Result::fail(
-				__( 'WordPress allows in-dashboard editing of theme and plugin files. An admin account with edit permissions can modify executable PHP files directly through the admin UI.', 'preflight-wp' ),
-				__( 'In wp-config.php, add: define(\'DISALLOW_FILE_EDIT\', true); — this disables the Theme and Plugin file editors.', 'preflight-wp' )
+			return Prelaunch_Checker_Check_Result::fail(
+				__( 'WordPress allows in-dashboard editing of theme and plugin files. An admin account with edit permissions can modify executable PHP files directly through the admin UI.', 'prelaunch-checker' ),
+				__( 'In wp-config.php, add: define(\'DISALLOW_FILE_EDIT\', true); this disables the Theme and Plugin file editors.', 'prelaunch-checker' )
 			);
 		}
 
-		return PreFlight_Check_Result::pass();
+		return Prelaunch_Checker_Check_Result::pass();
 	}
 
 	/**
@@ -252,25 +252,25 @@ class PreFlight_Checks_Security implements PreFlight_Check_Category {
 	 * reflects the low practical impact of the default prefix.
 	 *
 	 * @since 0.4.0
-	 * @return PreFlight_Check_Result
+	 * @return Prelaunch_Checker_Check_Result
 	 */
-	public function check_table_prefix(): PreFlight_Check_Result {
+	public function check_table_prefix(): Prelaunch_Checker_Check_Result {
 		global $wpdb;
 
 		if ( 'wp_' === $wpdb->prefix ) {
-			return PreFlight_Check_Result::fail(
-				__( 'Database table prefix is the default wp_. Changing it is a minor obscurity step against generic SQL injection attempts that hardcode wp_ table names.', 'preflight-wp' ),
-				__( 'Changing the prefix on an existing install requires renaming tables and updating wp-config.php and a few serialized option keys. Best done at install time. If migrating, use WP-CLI or a dedicated plugin and verify nothing breaks before completing the launch.', 'preflight-wp' )
+			return Prelaunch_Checker_Check_Result::fail(
+				__( 'Database table prefix is the default wp_. Changing it is a minor obscurity step against generic SQL injection attempts that hardcode wp_ table names.', 'prelaunch-checker' ),
+				__( 'Changing the prefix on an existing install requires renaming tables and updating wp-config.php and a few serialized option keys. Best done at install time. If migrating, use WP-CLI or a dedicated plugin and verify nothing breaks before completing the launch.', 'prelaunch-checker' )
 			);
 		}
 
-		return PreFlight_Check_Result::pass();
+		return Prelaunch_Checker_Check_Result::pass();
 	}
 }
 
 add_action(
-	'preflight_register_categories',
-	static function ( PreFlight_Core $core ): void {
-		$core->register_category( new PreFlight_Checks_Security() );
+	'prelaunch_checker_register_categories',
+	static function ( Prelaunch_Checker_Core $core ): void {
+		$core->register_category( new Prelaunch_Checker_Checks_Security() );
 	}
 );

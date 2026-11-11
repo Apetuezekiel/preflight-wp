@@ -2,7 +2,7 @@
 /**
  * Scan history persistence and delta computation service.
  *
- * @package PreFlight
+ * @package Prelaunch_Checker
  * @since   0.3.0
  */
 
@@ -11,14 +11,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Pure data service for reading and writing the preflight_scan_history option.
+ * Pure data service for reading and writing the prelaunch_checker_scan_history option.
  *
  * No UI concerns. No WordPress hook registration. Stateless — every method
  * reads from or writes to the database directly and returns a value.
  *
  * @since 0.3.0
  */
-class PreFlight_History {
+class Prelaunch_Checker_History {
 
 	/** Maximum number of scan envelopes retained in history (Brief §3.5). */
 	const MAX_HISTORY = 10;
@@ -27,14 +27,14 @@ class PreFlight_History {
 	 * Prepend a scan envelope to history and prune to MAX_HISTORY entries.
 	 *
 	 * @since  0.3.0
-	 * @param  array $envelope Scan envelope returned by PreFlight_Scanner::run().
+	 * @param  array $envelope Scan envelope returned by Prelaunch_Checker_Scanner::run().
 	 * @return void
 	 */
 	public function persist( array $envelope ): void {
 		$history = $this->get_all();
 		array_unshift( $history, $envelope );
 		$history = array_slice( $history, 0, self::MAX_HISTORY );
-		update_option( 'preflight_scan_history', $history, false );
+		update_option( 'prelaunch_checker_scan_history', $history, false );
 	}
 
 	/**
@@ -44,7 +44,7 @@ class PreFlight_History {
 	 * @return array
 	 */
 	public function get_all(): array {
-		return (array) get_option( 'preflight_scan_history', array() );
+		return (array) get_option( 'prelaunch_checker_scan_history', array() );
 	}
 
 	/**
@@ -96,7 +96,7 @@ class PreFlight_History {
 
 		if ( null === $previous ) {
 			foreach ( $current_results as $row ) {
-				if ( PREFLIGHT_STATUS_FAIL === $row['status'] ) {
+				if ( PRELAUNCH_CHECKER_STATUS_FAIL === $row['status'] ) {
 					$delta['new'][] = $row;
 				}
 			}
@@ -115,11 +115,11 @@ class PreFlight_History {
 
 		// New: failing now, not failing before.
 		foreach ( $current_results as $row ) {
-			if ( PREFLIGHT_STATUS_FAIL !== $row['status'] ) {
+			if ( PRELAUNCH_CHECKER_STATUS_FAIL !== $row['status'] ) {
 				continue;
 			}
 			$prev = $prev_by_id[ $row['id'] ] ?? null;
-			if ( null === $prev || PREFLIGHT_STATUS_FAIL !== $prev['status'] ) {
+			if ( null === $prev || PRELAUNCH_CHECKER_STATUS_FAIL !== $prev['status'] ) {
 				$delta['new'][] = $row;
 			} else {
 				$delta['unchanged'][] = $row;
@@ -128,11 +128,11 @@ class PreFlight_History {
 
 		// Resolved: was failing before, not failing now.
 		foreach ( $prev_by_id as $id => $prev_row ) {
-			if ( PREFLIGHT_STATUS_FAIL !== $prev_row['status'] ) {
+			if ( PRELAUNCH_CHECKER_STATUS_FAIL !== $prev_row['status'] ) {
 				continue;
 			}
 			$curr = $current_by_id[ $id ] ?? null;
-			if ( null === $curr || PREFLIGHT_STATUS_FAIL !== $curr['status'] ) {
+			if ( null === $curr || PRELAUNCH_CHECKER_STATUS_FAIL !== $curr['status'] ) {
 				$delta['resolved'][] = $prev_row;
 			}
 		}
@@ -150,6 +150,6 @@ class PreFlight_History {
 	 * @return void
 	 */
 	public function clear(): void {
-		delete_option( 'preflight_scan_history' );
+		delete_option( 'prelaunch_checker_scan_history' );
 	}
 }

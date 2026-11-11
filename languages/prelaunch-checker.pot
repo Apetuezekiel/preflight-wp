@@ -1,40 +1,45 @@
-# Copyright (C) 2026 Ezekiel / Zicstack
+# Copyright (C) 2026 Ezekiel Apetu
 # This file is distributed under the GPL v2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: PreFlight 0.1.0\n"
-"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/preflight-wp\n"
+"Project-Id-Version: Prelaunch Checker 1.0.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/prelaunch-checker\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-05-16T23:59:24+00:00\n"
+"POT-Creation-Date: 2026-11-11T07:17:19+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
-"X-Domain: preflight-wp\n"
+"X-Domain: prelaunch-checker\n"
 
 #. Plugin Name of the plugin
-#: preflight-wp.php
-#: includes/class-preflight-admin.php:57
-#: includes/class-preflight-admin.php:58
-#: includes/class-preflight-admin.php:79
-msgid "PreFlight"
+#: prelaunch-checker.php
+#: includes/class-prelaunch-checker-admin.php:57
+#: includes/class-prelaunch-checker-admin.php:58
+#: includes/class-prelaunch-checker-admin.php:79
+msgid "Prelaunch Checker"
 msgstr ""
 
 #. Plugin URI of the plugin
-#: preflight-wp.php
+#: prelaunch-checker.php
 msgid "https://github.com/Apetuezekiel/preflight-wp"
 msgstr ""
 
 #. Description of the plugin
-#: preflight-wp.php
+#: prelaunch-checker.php
 msgid "Automated pre-launch QA scanner for WordPress. Runs 30+ checks and produces a pass/fail report before go-live."
 msgstr ""
 
 #. Author of the plugin
-#: preflight-wp.php
-msgid "Ezekiel / Zicstack"
+#: prelaunch-checker.php
+msgid "Ezekiel Apetu"
+msgstr ""
+
+#. Author URI of the plugin
+#: prelaunch-checker.php
+msgid "https://github.com/Apetuezekiel"
 msgstr ""
 
 #: includes/checks/class-checks-content.php:33
@@ -129,7 +134,7 @@ msgid "Contact form plugin"
 msgstr ""
 
 #: includes/checks/class-checks-forms.php:187
-msgid "No transactional email plugin is active. WordPress will fall back to PHP's mail() function, which is unreliable on most managed hosts — password resets, order notifications, and contact form submissions may silently fail to deliver."
+msgid "No transactional email plugin is active. WordPress will fall back to PHP's mail() function, which is unreliable on most managed hosts; password resets, order notifications, and contact form submissions may silently fail to deliver."
 msgstr ""
 
 #: includes/checks/class-checks-forms.php:188
@@ -171,7 +176,7 @@ msgid "PHP %s is installed. PHP 7.4 reached end-of-life in November 2022 and no 
 msgstr ""
 
 #: includes/checks/class-checks-performance.php:158
-msgid "Contact your host to upgrade PHP to 8.2 or later. Test the site after upgrading — some plugins have PHP 8.x compatibility issues."
+msgid "Contact your host to upgrade PHP to 8.2 or later. Test the site after upgrading; some plugins have PHP 8.x compatibility issues."
 msgstr ""
 
 #: includes/checks/class-checks-performance.php:181
@@ -191,7 +196,7 @@ msgid "Object caching is most impactful on sites with many database queries (Woo
 msgstr ""
 
 #: includes/checks/class-checks-performance.php:226
-msgid "WordPress update data is not available — the background update check has not run yet. Re-scan after the update check completes."
+msgid "WordPress update data is not available; the background update check has not run yet. Re-scan after the update check completes."
 msgstr ""
 
 #. translators: 1: current WP version, 2: latest WP version
@@ -201,7 +206,7 @@ msgid "WordPress %1$s is installed. The latest major version is %2$s."
 msgstr ""
 
 #: includes/checks/class-checks-performance.php:251
-msgid "Update WordPress via Dashboard → Updates. Test the site after updating — backup first if no automated backup is in place."
+msgid "Update WordPress via Dashboard → Updates. Test the site after updating; backup first if no automated backup is in place."
 msgstr ""
 
 #: includes/checks/class-checks-plugins.php:81
@@ -221,7 +226,7 @@ msgid "Inactive plugins present"
 msgstr ""
 
 #: includes/checks/class-checks-plugins.php:162
-msgid "Plugin update data is not available — the background update check has not run yet."
+msgid "Plugin update data is not available; the background update check has not run yet."
 msgstr ""
 
 #. translators: 1: number of plugins with available updates, 2: comma-separated list of plugin names
@@ -231,7 +236,7 @@ msgid "%1$d plugin(s) have updates available: %2$s."
 msgstr ""
 
 #: includes/checks/class-checks-plugins.php:186
-msgid "Update plugins via Dashboard → Updates before launch. Test the site after updating — especially WooCommerce, page builders, and security plugins."
+msgid "Update plugins via Dashboard → Updates before launch. Test the site after updating; especially WooCommerce, page builders, and security plugins."
 msgstr ""
 
 #. translators: %s: comma-separated list of active development plugin names
@@ -283,7 +288,7 @@ msgid "XML-RPC enabled"
 msgstr ""
 
 #: includes/checks/class-checks-security.php:139
-msgid "Site is not configured for HTTPS — Site Address uses an http scheme."
+msgid "Site is not configured for HTTPS; Site Address uses an http scheme."
 msgstr ""
 
 #: includes/checks/class-checks-security.php:140
@@ -291,7 +296,7 @@ msgid "Install an SSL certificate (most hosts offer free Let's Encrypt). Then go
 msgstr ""
 
 #: includes/checks/class-checks-security.php:162
-msgid "readme.html exists in the WordPress root. PreFlight cannot verify HTTP accessibility without loopback (Phase 5); this file exposes the WordPress version to anyone who fetches it."
+msgid "readme.html exists in the WordPress root. Prelaunch Checker cannot verify HTTP accessibility without loopback (Phase 5); this file exposes the WordPress version to anyone who fetches it."
 msgstr ""
 
 #: includes/checks/class-checks-security.php:163
@@ -321,7 +326,7 @@ msgid "WordPress allows in-dashboard editing of theme and plugin files. An admin
 msgstr ""
 
 #: includes/checks/class-checks-security.php:239
-msgid "In wp-config.php, add: define('DISALLOW_FILE_EDIT', true); — this disables the Theme and Plugin file editors."
+msgid "In wp-config.php, add: define('DISALLOW_FILE_EDIT', true); this disables the Theme and Plugin file editors."
 msgstr ""
 
 #: includes/checks/class-checks-security.php:262
@@ -357,11 +362,11 @@ msgid "Either remove the filter that disables core sitemaps, or install an SEO p
 msgstr ""
 
 #: includes/checks/class-checks-seo.php:216
-msgid "No recognized SEO plugin is active. PreFlight detects: Yoast SEO, Rank Math, All in One SEO, SEOPress, The SEO Framework, Slim SEO, Squirrly."
+msgid "No recognized SEO plugin is active. Prelaunch Checker detects: Yoast SEO, Rank Math, All in One SEO, SEOPress, The SEO Framework, Slim SEO, Squirrly."
 msgstr ""
 
 #: includes/checks/class-checks-seo.php:217
-msgid "Not every site needs a dedicated SEO plugin — small content sites, or sites where SEO is handled at the theme or hosting level, may legitimately not have one. If this site relies on default WP metadata, this check can be suppressed."
+msgid "Not every site needs a dedicated SEO plugin; small content sites, or sites where SEO is handled at the theme or hosting level, may legitimately not have one. If this site relies on default WP metadata, this check can be suppressed."
 msgstr ""
 
 #: includes/checks/class-checks-seo.php:241
@@ -429,7 +434,7 @@ msgid "Site tagline is the WordPress default."
 msgstr ""
 
 #: includes/checks/class-checks-wp-config.php:155
-msgid "Settings → General → Tagline — replace with text describing this specific site."
+msgid "Settings → General → Tagline: replace with text describing this specific site."
 msgstr ""
 
 #: includes/checks/class-checks-wp-config.php:170
@@ -437,7 +442,7 @@ msgid "Search engine indexing is set to Discouraged."
 msgstr ""
 
 #: includes/checks/class-checks-wp-config.php:171
-msgid "Settings → Reading — uncheck \"Discourage search engines from indexing this site\" before DNS cutover."
+msgid "Settings → Reading: uncheck \"Discourage search engines from indexing this site\" before DNS cutover."
 msgstr ""
 
 #: includes/checks/class-checks-wp-config.php:186
@@ -445,200 +450,200 @@ msgid "WP_DEBUG is enabled."
 msgstr ""
 
 #: includes/checks/class-checks-wp-config.php:187
-msgid "wp-config.php — set define('WP_DEBUG', false); for production."
+msgid "wp-config.php: set define('WP_DEBUG', false); for production."
 msgstr ""
 
-#: includes/checks/class-checks-wp-config.php:205
-msgid "WP_DEBUG_DISPLAY is enabled — PHP errors will print to page output when WP_DEBUG is also enabled."
+#: includes/checks/class-checks-wp-config.php:208
+msgid "WP_DEBUG and WP_DEBUG_DISPLAY are both enabled, so PHP errors print on the page for every visitor."
 msgstr ""
 
-#: includes/checks/class-checks-wp-config.php:206
-msgid "wp-config.php — set define('WP_DEBUG_DISPLAY', false); before any WP_DEBUG definition."
+#: includes/checks/class-checks-wp-config.php:209
+msgid "wp-config.php: set define('WP_DEBUG_DISPLAY', false); before any WP_DEBUG definition."
 msgstr ""
 
 #. translators: %s: relative file path
-#: includes/checks/class-checks-wp-config.php:231
+#: includes/checks/class-checks-wp-config.php:234
 #, php-format
 msgid "Debug log file exists at %s. HTTP accessibility cannot be verified without loopback (Phase 5)."
 msgstr ""
 
-#: includes/checks/class-checks-wp-config.php:234
+#: includes/checks/class-checks-wp-config.php:237
 msgid "Delete the log file, or move it outside the webroot, or block public access at the server level. Set WP_DEBUG_LOG to false in wp-config.php."
 msgstr ""
 
-#: includes/checks/class-checks-wp-config.php:267
-msgid "Timezone is set as a UTC offset only — DST transitions will not be applied automatically."
+#: includes/checks/class-checks-wp-config.php:270
+msgid "Timezone is set as a UTC offset only; DST transitions will not be applied automatically."
 msgstr ""
 
-#: includes/checks/class-checks-wp-config.php:268
-msgid "Settings → General → Timezone — select a named city (e.g., \"America/New_York\") instead of a UTC offset."
+#: includes/checks/class-checks-wp-config.php:271
+msgid "Settings → General → Timezone: select a named city (e.g., \"America/New_York\") instead of a UTC offset."
 msgstr ""
 
-#: includes/checks/class-checks-wp-config.php:283
-msgid "Permalinks are set to Plain — URLs use ?p=123 query strings."
+#: includes/checks/class-checks-wp-config.php:286
+msgid "Permalinks are set to Plain; URLs use ?p=123 query strings."
 msgstr ""
 
-#: includes/checks/class-checks-wp-config.php:284
-msgid "Settings → Permalinks — select any structure other than Plain (recommended: Post name)."
+#: includes/checks/class-checks-wp-config.php:287
+msgid "Settings → Permalinks: select any structure other than Plain (recommended: Post name)."
 msgstr ""
 
-#: includes/checks/class-checks-wp-config.php:311
+#: includes/checks/class-checks-wp-config.php:314
 msgid "Site URL and Home URL differ in scheme or host."
 msgstr ""
 
-#: includes/checks/class-checks-wp-config.php:312
-msgid "If WordPress is intentionally installed at a separate location from the public site root, suppress this check. Otherwise, Settings → General — align both URLs to the production domain."
+#: includes/checks/class-checks-wp-config.php:315
+msgid "If WordPress is intentionally installed at a separate location from the public site root, suppress this check. Otherwise, Settings → General: align both URLs to the production domain."
 msgstr ""
 
 #. translators: %s: site URL hostname
-#: includes/checks/class-checks-wp-config.php:356
+#: includes/checks/class-checks-wp-config.php:359
 #, php-format
 msgid "Site URL host \"%s\" matches a known staging or local-development pattern."
 msgstr ""
 
-#: includes/checks/class-checks-wp-config.php:359
+#: includes/checks/class-checks-wp-config.php:362
 msgid "Update Site URL and Home URL to the production domain before launch. If this IS the production site, suppress this check."
 msgstr ""
 
 #. translators: %s: site URL hostname
-#: includes/checks/class-checks-wp-config.php:381
+#: includes/checks/class-checks-wp-config.php:384
 #, php-format
 msgid "Site URL host \"%s\" contains a generic development/staging substring."
 msgstr ""
 
-#: includes/checks/class-checks-wp-config.php:384
+#: includes/checks/class-checks-wp-config.php:387
 msgid "If this substring is part of the legitimate production domain, suppress this check. Otherwise, update Site URL and Home URL to the production domain."
 msgstr ""
 
 #. translators: %s: comma-separated list of URL sources checked
-#: includes/checks/class-checks-wp-config.php:422
+#: includes/checks/class-checks-wp-config.php:425
 #, php-format
 msgid "URL schemes are not consistent across %s."
 msgstr ""
 
-#: includes/checks/class-checks-wp-config.php:425
+#: includes/checks/class-checks-wp-config.php:428
 msgid "Align all URL schemes to https for production. Update wp-config.php if WP_CONTENT_URL is explicitly defined."
 msgstr ""
 
-#: includes/checks/class-checks-wp-config.php:465
+#: includes/checks/class-checks-wp-config.php:468
 msgid "Cannot evaluate auto-update filters without the update_core transient. Visit Dashboard → Updates to trigger WordPress's update check, then re-run the scan."
 msgstr ""
 
-#: includes/checks/class-checks-wp-config.php:482
+#: includes/checks/class-checks-wp-config.php:485
 msgid "Automatic updates for WordPress core are disabled."
 msgstr ""
 
-#: includes/checks/class-checks-wp-config.php:483
+#: includes/checks/class-checks-wp-config.php:486
 msgid "If updates are managed manually (e.g., via a deployment pipeline), this is informational only. Otherwise, remove AUTOMATIC_UPDATER_DISABLED or WP_AUTO_UPDATE_CORE constants from wp-config.php."
 msgstr ""
 
-#: includes/class-preflight-admin.php:72
+#: includes/class-prelaunch-checker-admin.php:72
 msgid "You do not have permission to access this page."
 msgstr ""
 
-#: includes/class-preflight-admin.php:119
-#: includes/class-preflight-admin.php:181
+#: includes/class-prelaunch-checker-admin.php:119
+#: includes/class-prelaunch-checker-admin.php:181
 msgid "Nonce verification failed."
 msgstr ""
 
-#: includes/class-preflight-admin.php:123
-#: includes/class-preflight-admin.php:185
-#: includes/class-preflight-admin.php:252
+#: includes/class-prelaunch-checker-admin.php:123
+#: includes/class-prelaunch-checker-admin.php:185
+#: includes/class-prelaunch-checker-admin.php:252
 msgid "Insufficient permissions."
 msgstr ""
 
-#: includes/class-preflight-admin.php:236
-msgid "Scanning\\xe2\\x80\\xa6"
+#: includes/class-prelaunch-checker-admin.php:236
+msgid "Scanning…"
 msgstr ""
 
-#: includes/class-preflight-admin.php:237
-#: templates/dashboard.php:145
+#: includes/class-prelaunch-checker-admin.php:237
+#: templates/dashboard.php:146
 msgid "Re-scan"
 msgstr ""
 
-#: includes/class-preflight-admin.php:238
+#: includes/class-prelaunch-checker-admin.php:238
 msgid "Scan failed. Please try again."
 msgstr ""
 
-#: includes/class-preflight-admin.php:296
+#: includes/class-prelaunch-checker-admin.php:296
 msgid "Dashboard"
 msgstr ""
 
-#: includes/class-preflight-admin.php:297
+#: includes/class-prelaunch-checker-admin.php:297
 msgid "History"
 msgstr ""
 
-#: includes/class-preflight-admin.php:298
+#: includes/class-prelaunch-checker-admin.php:298
 msgid "Settings"
 msgstr ""
 
-#: includes/class-preflight-admin.php:301
-msgid "PreFlight tabs"
+#: includes/class-prelaunch-checker-admin.php:301
+msgid "Prelaunch Checker tabs"
 msgstr ""
 
-#: includes/class-preflight-admin.php:358
+#: includes/class-prelaunch-checker-admin.php:358
 msgid "Scan complete."
 msgstr ""
 
-#: includes/class-preflight-admin.php:451
+#: includes/class-prelaunch-checker-admin.php:451
 msgid "Settings saved."
 msgstr ""
 
-#: templates/dashboard.php:29
+#: templates/dashboard.php:30
 msgid "No scan results yet. Click \"Run Scan\" to check this site for pre-launch issues."
 msgstr ""
 
-#: templates/dashboard.php:34
+#: templates/dashboard.php:35
 msgid "Run Scan"
 msgstr ""
 
-#: templates/dashboard.php:48
+#: templates/dashboard.php:49
 msgid "Scan summary"
 msgstr ""
 
 #. translators: %s: scan timestamp
-#: templates/dashboard.php:54
+#: templates/dashboard.php:55
 #, php-format
 msgid "Last scanned: %s"
 msgstr ""
 
-#: templates/dashboard.php:60
+#: templates/dashboard.php:61
 msgid "Issue counts by severity"
 msgstr ""
 
-#: templates/dashboard.php:62
+#: templates/dashboard.php:63
 msgid "BLOCKER"
 msgstr ""
 
-#: templates/dashboard.php:66
+#: templates/dashboard.php:67
 msgid "WARNING"
 msgstr ""
 
-#: templates/dashboard.php:70
+#: templates/dashboard.php:71
 msgid "INFO"
 msgstr ""
 
-#: templates/dashboard.php:74
-#: templates/dashboard.php:238
+#: templates/dashboard.php:75
+#: templates/dashboard.php:240
 msgid "PASS"
 msgstr ""
 
 #. translators: %s: scan timestamp
-#: templates/dashboard.php:88
+#: templates/dashboard.php:89
 #, php-format
 msgid "Viewing historical scan from %s."
 msgstr ""
 
-#: templates/dashboard.php:94
+#: templates/dashboard.php:95
 msgid "View latest scan"
 msgstr ""
 
-#: templates/dashboard.php:106
+#: templates/dashboard.php:107
 msgid "Changes since last scan"
 msgstr ""
 
 #. translators: %d: number of new issues
-#: templates/dashboard.php:113
+#: templates/dashboard.php:114
 #, php-format
 msgid "%d new issue"
 msgid_plural "%d new issues"
@@ -646,136 +651,136 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %d: number of resolved issues
-#: templates/dashboard.php:126
+#: templates/dashboard.php:127
 #, php-format
 msgid "%d resolved"
 msgid_plural "%d resolved"
 msgstr[0] ""
 msgstr[1] ""
 
-#: templates/dashboard.php:134
+#: templates/dashboard.php:135
 msgid "No changes since last scan."
 msgstr ""
 
 #. translators: %d: number of failing checks in this category
-#: templates/dashboard.php:210
+#: templates/dashboard.php:211
 #, php-format
 msgid "%d issue"
 msgid_plural "%d issues"
 msgstr[0] ""
 msgstr[1] ""
 
-#: templates/dashboard.php:224
+#: templates/dashboard.php:226
 msgid "Severity"
 msgstr ""
 
-#: templates/dashboard.php:225
+#: templates/dashboard.php:227
 msgid "Check"
 msgstr ""
 
-#: templates/dashboard.php:226
+#: templates/dashboard.php:228
 msgid "Result"
 msgstr ""
 
-#: templates/dashboard.php:240
+#: templates/dashboard.php:242
 msgid "SKIP"
 msgstr ""
 
-#: templates/dashboard.php:255
-#: templates/history.php:36
+#: templates/dashboard.php:257
+#: templates/history.php:38
 msgid "Passed"
 msgstr ""
 
-#: templates/history.php:20
+#: templates/history.php:22
 msgid "No scan history yet. Run a scan from the Dashboard tab to get started."
 msgstr ""
 
-#: templates/history.php:26
+#: templates/history.php:28
 msgid "Showing the last 10 scans. Click a row to view detailed results."
 msgstr ""
 
-#: templates/history.php:32
+#: templates/history.php:34
 msgid "Scan time"
 msgstr ""
 
-#: templates/history.php:33
+#: templates/history.php:35
 msgid "Blockers"
 msgstr ""
 
-#: templates/history.php:34
+#: templates/history.php:36
 msgid "Warnings"
 msgstr ""
 
-#: templates/history.php:35
+#: templates/history.php:37
 msgid "Info"
 msgstr ""
 
-#: templates/history.php:37
+#: templates/history.php:39
 msgid "Skipped"
 msgstr ""
 
 #. translators: %s: scan date and time string
-#: templates/history.php:62
+#: templates/history.php:64
 #, php-format
 msgid "View scan from %s"
 msgstr ""
 
-#: templates/history.php:64
+#: templates/history.php:66
 msgid "latest"
 msgstr ""
 
 #. translators: %d: number of blocker-severity issues in this scan
-#: templates/history.php:68
+#: templates/history.php:70
 #, php-format
 msgid "%d blockers"
 msgstr ""
 
 #. translators: %d: number of warning-severity issues in this scan
-#: templates/history.php:75
+#: templates/history.php:77
 #, php-format
 msgid "%d warnings"
 msgstr ""
 
 #. translators: %d: number of info-severity issues in this scan
-#: templates/history.php:82
+#: templates/history.php:84
 #, php-format
 msgid "%d info"
 msgstr ""
 
-#: templates/settings.php:30
+#: templates/settings.php:31
 msgid "Check Toggles"
 msgstr ""
 
-#: templates/settings.php:32
+#: templates/settings.php:33
 msgid "Uncheck a box to disable that check. Disabled checks are skipped during scans."
 msgstr ""
 
 #. translators: %s: category label
-#: templates/settings.php:43
+#: templates/settings.php:44
 #, php-format
 msgid "Checks in category: %s"
 msgstr ""
 
-#: templates/settings.php:84
+#: templates/settings.php:85
 msgid "Developer Info"
 msgstr ""
 
-#: templates/settings.php:86
+#: templates/settings.php:87
 msgid "Optional. Included in scan reports (Phase 3)."
 msgstr ""
 
-#: templates/settings.php:91
+#: templates/settings.php:92
 msgid "Your name"
 msgstr ""
 
-#: templates/settings.php:106
+#: templates/settings.php:107
 msgid "Your email"
 msgstr ""
 
-#: templates/settings.php:121
+#: templates/settings.php:122
 msgid "Your URL"
 msgstr ""
 
-#: templates/settings.php:137
+#: templates/settings.php:138
 msgid "Save Settings"
 msgstr ""

@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Prelaunch Checker listing art</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --deep: #0b2b26;
+    --mid: #0f4c43;
+    --teal: #12806f;
+    --go: #22c55e;
+    --blocker: #d63638;
+    --warning: #dba617;
+    --info: #2271b1;
+    --pass: #008a20;
+    --ink: #1d2327;
+    --muted: #646970;
+    --border: #dcdcde;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: transparent; }
+  body { font-family: Inter, system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  .art { display: none; }
+  body[data-mode="icon"] #icon { display: block; }
+  body[data-mode="banner"] #banner { display: block; }
+
+  #icon { width: 128px; height: 128px; }
+  #icon svg { display: block; width: 128px; height: 128px; }
+
+  #banner {
+    position: relative; width: 772px; height: 250px; overflow: hidden; color: #fff;
+    background: linear-gradient(130deg, var(--deep) 0%, var(--mid) 55%, var(--teal) 100%);
+  }
+  #banner .glow {
+    position: absolute; right: -140px; top: -170px; width: 540px; height: 540px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(34, 197, 94, .22) 0%, rgba(34, 197, 94, 0) 65%);
+  }
+  #banner .dots {
+    position: absolute; inset: 0; opacity: .10;
+    background-image: radial-gradient(#fff 1px, transparent 1.2px); background-size: 18px 18px;
+    mask-image: linear-gradient(90deg, transparent 0%, #000 60%);
+  }
+  #banner .copy { position: absolute; left: 44px; top: 52px; width: 400px; }
+  #banner .brand { display: flex; align-items: center; gap: 12px; }
+  #banner .brand svg { width: 42px; height: 42px; flex: none; filter: drop-shadow(0 4px 10px rgba(0,0,0,.28)); }
+  #banner h1 { font-size: 30px; font-weight: 800; letter-spacing: -0.02em; line-height: 1; }
+  #banner .tag { margin-top: 16px; font-size: 18px; font-weight: 500; line-height: 1.35; color: #cfe9e2; }
+  #banner .chips { margin-top: 20px; display: flex; gap: 6px; }
+  #banner .chip {
+    font-size: 11px; font-weight: 600; color: #fff; padding: 5px 10px; border-radius: 999px; white-space: nowrap;
+    background: rgba(255,255,255,.10); border: 1px solid rgba(255,255,255,.24);
+  }
+
+  #banner .card {
+    position: absolute; left: 452px; top: 32px; width: 286px; height: 230px;
+    background: #fff; color: var(--ink); border-radius: 10px; overflow: hidden;
+    box-shadow: 0 18px 40px rgba(0,0,0,.38), 0 2px 6px rgba(0,0,0,.2);
+  }
+  #banner .bar {
+    height: 30px; display: flex; align-items: center; gap: 6px; padding: 0 12px;
+    background: #1d2327; color: #fff; font-size: 10px; font-weight: 600;
+  }
+  #banner .bar i { width: 7px; height: 7px; border-radius: 50%; background: rgba(255,255,255,.28); display: block; }
+  #banner .bar span { margin-left: 6px; opacity: .9; }
+  #banner .body { padding: 11px 13px; }
+  #banner .counts { display: flex; gap: 8px; align-items: center; padding: 8px 9px; border: 1px solid var(--border); border-radius: 6px; background: #f6f7f7; }
+  #banner .pill { font-size: 7.5px; font-weight: 800; letter-spacing: .05em; color: #fff; padding: 3px 5px; border-radius: 3px; }
+  #banner .pill.b { background: var(--blocker); } #banner .pill.w { background: var(--warning); color: #1d2327; }
+  #banner .pill.p { background: var(--pass); } #banner .pill.i { background: var(--info); }
+  #banner .counts b { font-size: 12px; font-weight: 800; margin-right: 2px; }
+  #banner .resolved { margin-top: 7px; font-size: 9px; font-weight: 700; color: var(--pass); }
+  #banner .row { display: grid; grid-template-columns: 58px 1fr; align-items: center; gap: 6px; padding: 6px 2px; border-bottom: 1px solid #f0f0f1; }
+  #banner .row:last-child { border-bottom: 0; }
+  #banner .row .t { font-size: 9.5px; font-weight: 600; }
+  #banner .row .h { display: block; font-size: 8px; font-weight: 500; color: var(--muted); margin-top: 1px; }
+  #banner .rows { margin-top: 6px; }
+</style>
+</head>
+<body data-mode="banner">
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0b2b26"/>
+      <stop offset=".55" stop-color="#0f4c43"/>
+      <stop offset="1" stop-color="#12806f"/>
+    </linearGradient>
+    <!-- Clipboard with three ticked rows and a green "go" badge. Drawn on a 256 grid. -->
+    <g id="board">
+      <rect x="62" y="44" width="132" height="168" rx="14" fill="#fff"/>
+      <rect x="98" y="30" width="60" height="30" rx="9" fill="#cfe9e2" stroke="#0b2b26" stroke-width="0"/>
+      <g stroke="#12806f" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" fill="none">
+        <path d="M80 92 l9 9 l17 -18"/>
+        <path d="M80 132 l9 9 l17 -18"/>
+      </g>
+      <rect x="118" y="88" width="56" height="10" rx="5" fill="#9fb8b2"/>
+      <rect x="118" y="128" width="46" height="10" rx="5" fill="#9fb8b2"/>
+      <rect x="82" y="166" width="22" height="10" rx="5" fill="#d7e2df"/>
+      <rect x="118" y="166" width="38" height="10" rx="5" fill="#d7e2df"/>
+    </g>
+    <g id="go">
+      <circle cx="0" cy="0" r="38" fill="#22c55e" stroke="#fff" stroke-width="8"/>
+      <path d="M-14 1 L-3 12 L16 -10" fill="none" stroke="#fff" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+    <symbol id="mark-sq" viewBox="0 0 256 256">
+      <rect width="256" height="256" fill="url(#bg)"/>
+      <use href="#board" transform="translate(-10 4)"/>
+      <use href="#go" transform="translate(182 184)"/>
+    </symbol>
+    <symbol id="mark" viewBox="0 0 256 256">
+      <rect width="256" height="256" rx="56" fill="url(#bg)"/>
+      <use href="#board" transform="translate(-10 4)"/>
+      <use href="#go" transform="translate(182 184)"/>
+    </symbol>
+  </defs>
+</svg>
+
+<div id="icon" class="art"><svg viewBox="0 0 256 256" aria-label="Prelaunch Checker icon"><use href="#mark-sq"/></svg></div>
+
+<div id="banner" class="art" aria-label="Prelaunch Checker banner">
+  <div class="glow"></div>
+  <div class="dots"></div>
+  <div class="copy">
+    <div class="brand">
+      <svg viewBox="0 0 256 256"><use href="#mark"/></svg>
+      <h1>Prelaunch Checker</h1>
+    </div>
+    <p class="tag">Know the site is ready<br>before it goes live.</p>
+    <div class="chips">
+      <span class="chip">35 checks</span>
+      <span class="chip">Blockers first</span>
+      <span class="chip">Runs locally, no tracking</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="bar"><i></i><i></i><i></i><span>Tools: Prelaunch Checker</span></div>
+    <div class="body">
+      <div class="counts">
+        <span class="pill b">BLOCKER</span><b>0</b>
+        <span class="pill w">WARNING</span><b>1</b>
+        <span class="pill p">PASS</span><b>34</b>
+      </div>
+      <p class="resolved">3 resolved since last scan</p>
+      <div class="rows">
+        <div class="row"><span><span class="pill p">PASS</span></span><span class="t">Search engine visibility</span></div>
+        <div class="row"><span><span class="pill p">PASS</span></span><span class="t">WP_DEBUG disabled</span></div>
+        <div class="row"><span><span class="pill w">WARNING</span></span><span class="t">Transactional email<span class="h">Install an SMTP plugin so resets get delivered.</span></span></div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  const mode = new URLSearchParams(location.search).get('mode');
+  if (mode) document.body.dataset.mode = mode;
+</script>
+</body>
+</html>
