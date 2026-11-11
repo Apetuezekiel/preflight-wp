@@ -2,7 +2,7 @@
 /**
  * Scan orchestrator: iterates registered categories, runs checks, returns result envelope.
  *
- * @package PreFlight
+ * @package Prelaunch_Checker
  * @since   0.2.0
  */
 
@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class PreFlight_Scanner {
+class Prelaunch_Checker_Scanner {
 
 	/**
 	 * Signals that a scan is currently in progress.
@@ -36,14 +36,14 @@ class PreFlight_Scanner {
 	/**
 	 * Core instance providing category registry and settings access.
 	 *
-	 * @var PreFlight_Core
+	 * @var Prelaunch_Checker_Core
 	 */
 	private $core;
 
 	/**
-	 * @param PreFlight_Core $core Injected — scanner never calls instance() internally.
+	 * @param Prelaunch_Checker_Core $core Injected — scanner never calls instance() internally.
 	 */
-	public function __construct( PreFlight_Core $core ) {
+	public function __construct( Prelaunch_Checker_Core $core ) {
 		$this->core = $core;
 	}
 
@@ -121,15 +121,15 @@ class PreFlight_Scanner {
 	 * that a misbehaving check never crashes the scan (§5.2).
 	 *
 	 * @since  0.2.0
-	 * @param  PreFlight_Check $check
+	 * @param  Prelaunch_Checker_Check $check
 	 * @param  string          $category_id
 	 * @return array {id, category, label, severity, status, message, fix_hint}
 	 */
-	protected function run_single_check( PreFlight_Check $check, string $category_id ): array {
+	protected function run_single_check( Prelaunch_Checker_Check $check, string $category_id ): array {
 		try {
 			$result = $check->run();
 		} catch ( \Throwable $e ) {
-			$result = PreFlight_Check_Result::skip(
+			$result = Prelaunch_Checker_Check_Result::skip(
 				get_class( $e ) . ': ' . $e->getMessage()
 			);
 		}
@@ -151,12 +151,12 @@ class PreFlight_Scanner {
 	 * Resolve effective severity for a check.
 	 *
 	 * Currently returns the check's declared default. In v1.1, when severity
-	 * overrides ship (Brief §3.6), this method reads from preflight_settings —
+	 * overrides ship (Brief §3.6), this method reads from prelaunch_checker_settings —
 	 * the upgrade is a one-line change here, no other method changes.
 	 *
 	 * @since  0.2.0
 	 * @param  string $check_id        Namespaced check ID (unused until v1.1).
-	 * @param  string $default_severity One of PREFLIGHT_SEVERITY_*.
+	 * @param  string $default_severity One of PRELAUNCH_CHECKER_SEVERITY_*.
 	 * @return string
 	 */
 	protected function apply_severity( string $check_id, string $default_severity ): string {
@@ -191,7 +191,7 @@ class PreFlight_Scanner {
 	 *   a category class that calls an undefined static method on itself inside
 	 *   get_check(). Because get_check() is called *outside* the run_single_check
 	 *   try/catch, a fatal there bypasses the per-check guard and reaches this
-	 *   handler. After the fatal, get_transient('preflight_partial_scan_<ts>')
+	 *   handler. After the fatal, get_transient('prelaunch_checker_partial_scan_<ts>')
 	 *   should return the results collected before the bad check was reached.
 	 *   Note: \Throwable in run() *is* caught per-check, so only code between
 	 *   the try/catch blocks (i.e. category->get_check()) triggers this path.
@@ -240,7 +240,7 @@ class PreFlight_Scanner {
 		}
 
 		set_transient(
-			'preflight_partial_scan_' . $scan_start_ts,
+			'prelaunch_checker_partial_scan_' . $scan_start_ts,
 			array(
 				'partial' => true,
 				'fatal'   => $error,
@@ -271,19 +271,19 @@ class PreFlight_Scanner {
 		);
 
 		foreach ( $results as $row ) {
-			if ( PREFLIGHT_STATUS_PASS === $row['status'] ) {
+			if ( PRELAUNCH_CHECKER_STATUS_PASS === $row['status'] ) {
 				$summary['passed']++;
-			} elseif ( PREFLIGHT_STATUS_SKIP === $row['status'] ) {
+			} elseif ( PRELAUNCH_CHECKER_STATUS_SKIP === $row['status'] ) {
 				$summary['skipped']++;
-			} elseif ( PREFLIGHT_STATUS_FAIL === $row['status'] ) {
+			} elseif ( PRELAUNCH_CHECKER_STATUS_FAIL === $row['status'] ) {
 				switch ( $row['severity'] ) {
-					case PREFLIGHT_SEVERITY_BLOCKER:
+					case PRELAUNCH_CHECKER_SEVERITY_BLOCKER:
 						$summary['blockers']++;
 						break;
-					case PREFLIGHT_SEVERITY_WARNING:
+					case PRELAUNCH_CHECKER_SEVERITY_WARNING:
 						$summary['warnings']++;
 						break;
-					case PREFLIGHT_SEVERITY_INFO:
+					case PRELAUNCH_CHECKER_SEVERITY_INFO:
 						$summary['info']++;
 						break;
 				}

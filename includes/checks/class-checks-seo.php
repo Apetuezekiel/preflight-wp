@@ -2,7 +2,7 @@
 /**
  * SEO Readiness check category — 3 checks per Brief §3.2.
  *
- * @package PreFlight
+ * @package Prelaunch_Checker
  * @since   0.5.0
  */
 
@@ -29,7 +29,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 0.5.0
  */
-class PreFlight_Checks_SEO implements PreFlight_Check_Category {
+class Prelaunch_Checker_Checks_SEO implements Prelaunch_Checker_Check_Category {
 
 	/**
 	 * Plugin label → detection signal map for recognised SEO plugins.
@@ -46,7 +46,7 @@ class PreFlight_Checks_SEO implements PreFlight_Check_Category {
 	 *     is the SLIM_SEO_VER constant.
 	 *     Source: github.com/elightup/slim-seo slim-seo.php
 	 *
-	 * Extension point (v1.1): a filter hook 'preflight_seo_plugin_signals' will
+	 * Extension point (v1.1): a filter hook 'prelaunch_checker_seo_plugin_signals' will
 	 * allow site-specific additions. Do not implement the filter now.
 	 *
 	 * @var array<string, string>
@@ -79,7 +79,7 @@ class PreFlight_Checks_SEO implements PreFlight_Check_Category {
 	 *   - 'OGFB' (Open Graph for Facebook): could not be verified against any
 	 *     current published plugin. Dropped from signal list.
 	 *
-	 * Extension point (v1.1): a filter hook 'preflight_og_plugin_signals' will
+	 * Extension point (v1.1): a filter hook 'prelaunch_checker_og_plugin_signals' will
 	 * allow additions. Do not implement the filter now.
 	 *
 	 * @var array<string, string>
@@ -90,7 +90,7 @@ class PreFlight_Checks_SEO implements PreFlight_Check_Category {
 	);
 
 	// -------------------------------------------------------------------------
-	// PreFlight_Check_Category interface
+	// Prelaunch_Checker_Check_Category interface
 	// -------------------------------------------------------------------------
 
 	/**
@@ -104,7 +104,7 @@ class PreFlight_Checks_SEO implements PreFlight_Check_Category {
 	 * @return string
 	 */
 	public function get_category_label(): string {
-		return __( 'SEO Readiness', 'preflight-wp' );
+		return __( 'SEO Readiness', 'prelaunch-checker' );
 	}
 
 	/**
@@ -122,14 +122,14 @@ class PreFlight_Checks_SEO implements PreFlight_Check_Category {
 	 * Return a check object for the given ID, or null if unknown.
 	 *
 	 * @param string $id Namespaced check ID.
-	 * @return PreFlight_Check|null
+	 * @return Prelaunch_Checker_Check|null
 	 */
-	public function get_check( string $id ): ?PreFlight_Check {
+	public function get_check( string $id ): ?Prelaunch_Checker_Check {
 		foreach ( self::get_spec() as $entry ) {
 			if ( $entry[0] !== $id ) {
 				continue;
 			}
-			return new PreFlight_Configurable_Check(
+			return new Prelaunch_Checker_Configurable_Check(
 				$entry[0],
 				$entry[1],
 				$entry[2],
@@ -152,9 +152,9 @@ class PreFlight_Checks_SEO implements PreFlight_Check_Category {
 	 */
 	private static function get_spec(): array {
 		return array(
-			array( 'seo.no-sitemap-generator', __( 'XML sitemap generator',    'preflight-wp' ), PREFLIGHT_SEVERITY_WARNING, 'check_sitemap_generator' ),
-			array( 'seo.no-seo-plugin',        __( 'SEO plugin detection',     'preflight-wp' ), PREFLIGHT_SEVERITY_INFO,    'check_seo_plugin' ),
-			array( 'seo.no-og-plugin',         __( 'Open Graph tag generator', 'preflight-wp' ), PREFLIGHT_SEVERITY_INFO,    'check_og_plugin' ),
+			array( 'seo.no-sitemap-generator', __( 'XML sitemap generator',    'prelaunch-checker' ), PRELAUNCH_CHECKER_SEVERITY_WARNING, 'check_sitemap_generator' ),
+			array( 'seo.no-seo-plugin',        __( 'SEO plugin detection',     'prelaunch-checker' ), PRELAUNCH_CHECKER_SEVERITY_INFO,    'check_seo_plugin' ),
+			array( 'seo.no-og-plugin',         __( 'Open Graph tag generator', 'prelaunch-checker' ), PRELAUNCH_CHECKER_SEVERITY_INFO,    'check_og_plugin' ),
 		);
 	}
 
@@ -179,22 +179,22 @@ class PreFlight_Checks_SEO implements PreFlight_Check_Category {
 	 * returns content. HTTP accessibility is deferred to Phase 5.
 	 *
 	 * @since 0.5.0
-	 * @return PreFlight_Check_Result
+	 * @return Prelaunch_Checker_Check_Result
 	 */
-	public function check_sitemap_generator(): PreFlight_Check_Result {
+	public function check_sitemap_generator(): Prelaunch_Checker_Check_Result {
 		// SEO plugin present — all listed plugins generate sitemaps.
 		if ( null !== $this->matches_any_signal( self::SEO_PLUGIN_SIGNALS ) ) {
-			return PreFlight_Check_Result::pass();
+			return Prelaunch_Checker_Check_Result::pass();
 		}
 
 		// Core sitemap generator enabled (default WordPress 5.5+ behaviour).
 		if ( true === apply_filters( 'wp_sitemaps_enabled', true ) ) { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- core WP hook, not registered by this plugin.
-			return PreFlight_Check_Result::pass();
+			return Prelaunch_Checker_Check_Result::pass();
 		}
 
-		return PreFlight_Check_Result::fail(
-			__( 'No sitemap generator is active. The site is on WordPress 6.0+ but core sitemaps appear to be disabled via the wp_sitemaps_enabled filter, and no SEO plugin that generates sitemaps is detected.', 'preflight-wp' ),
-			__( 'Either remove the filter that disables core sitemaps, or install an SEO plugin that generates sitemaps (Yoast SEO, Rank Math, All in One SEO, or SEOPress).', 'preflight-wp' )
+		return Prelaunch_Checker_Check_Result::fail(
+			__( 'No sitemap generator is active. The site is on WordPress 6.0+ but core sitemaps appear to be disabled via the wp_sitemaps_enabled filter, and no SEO plugin that generates sitemaps is detected.', 'prelaunch-checker' ),
+			__( 'Either remove the filter that disables core sitemaps, or install an SEO plugin that generates sitemaps (Yoast SEO, Rank Math, All in One SEO, or SEOPress).', 'prelaunch-checker' )
 		);
 	}
 
@@ -202,19 +202,19 @@ class PreFlight_Checks_SEO implements PreFlight_Check_Category {
 	 * Fail when no recognised SEO plugin is active.
 	 *
 	 * Iterates SEO_PLUGIN_SIGNALS; passes on the first match. The fail message
-	 * names the plugins PreFlight can detect so the developer knows the coverage.
+	 * names the plugins Prelaunch Checker can detect so the developer knows the coverage.
 	 *
 	 * @since 0.5.0
-	 * @return PreFlight_Check_Result
+	 * @return Prelaunch_Checker_Check_Result
 	 */
-	public function check_seo_plugin(): PreFlight_Check_Result {
+	public function check_seo_plugin(): Prelaunch_Checker_Check_Result {
 		if ( null !== $this->matches_any_signal( self::SEO_PLUGIN_SIGNALS ) ) {
-			return PreFlight_Check_Result::pass();
+			return Prelaunch_Checker_Check_Result::pass();
 		}
 
-		return PreFlight_Check_Result::fail(
-			__( 'No recognized SEO plugin is active. PreFlight detects: Yoast SEO, Rank Math, All in One SEO, SEOPress, The SEO Framework, Slim SEO, Squirrly.', 'preflight-wp' ),
-			__( 'Not every site needs a dedicated SEO plugin — small content sites, or sites where SEO is handled at the theme or hosting level, may legitimately not have one. If this site relies on default WP metadata, this check can be suppressed.', 'preflight-wp' )
+		return Prelaunch_Checker_Check_Result::fail(
+			__( 'No recognized SEO plugin is active. Prelaunch Checker detects: Yoast SEO, Rank Math, All in One SEO, SEOPress, The SEO Framework, Slim SEO, Squirrly.', 'prelaunch-checker' ),
+			__( 'Not every site needs a dedicated SEO plugin; small content sites, or sites where SEO is handled at the theme or hosting level, may legitimately not have one. If this site relies on default WP metadata, this check can be suppressed.', 'prelaunch-checker' )
 		);
 	}
 
@@ -226,20 +226,20 @@ class PreFlight_Checks_SEO implements PreFlight_Check_Category {
 	 * signal resolves.
 	 *
 	 * @since 0.5.0
-	 * @return PreFlight_Check_Result
+	 * @return Prelaunch_Checker_Check_Result
 	 */
-	public function check_og_plugin(): PreFlight_Check_Result {
+	public function check_og_plugin(): Prelaunch_Checker_Check_Result {
 		if ( null !== $this->matches_any_signal( self::SEO_PLUGIN_SIGNALS ) ) {
-			return PreFlight_Check_Result::pass();
+			return Prelaunch_Checker_Check_Result::pass();
 		}
 
 		if ( null !== $this->matches_any_signal( self::OG_DEDICATED_PLUGIN_SIGNALS ) ) {
-			return PreFlight_Check_Result::pass();
+			return Prelaunch_Checker_Check_Result::pass();
 		}
 
-		return PreFlight_Check_Result::fail(
-			__( 'No plugin that generates Open Graph tags is detected. Social media link previews will use whatever the theme outputs by default, which is often limited or absent.', 'preflight-wp' ),
-			__( 'Activate an SEO plugin (Yoast SEO, Rank Math, All in One SEO, SEOPress) or a dedicated Open Graph plugin. Verify the social previews via the official Facebook Sharing Debugger and Twitter Card Validator after launch.', 'preflight-wp' )
+		return Prelaunch_Checker_Check_Result::fail(
+			__( 'No plugin that generates Open Graph tags is detected. Social media link previews will use whatever the theme outputs by default, which is often limited or absent.', 'prelaunch-checker' ),
+			__( 'Activate an SEO plugin (Yoast SEO, Rank Math, All in One SEO, SEOPress) or a dedicated Open Graph plugin. Verify the social previews via the official Facebook Sharing Debugger and Twitter Card Validator after launch.', 'prelaunch-checker' )
 		);
 	}
 
@@ -264,8 +264,8 @@ class PreFlight_Checks_SEO implements PreFlight_Check_Category {
 }
 
 add_action(
-	'preflight_register_categories',
-	static function ( PreFlight_Core $core ): void {
-		$core->register_category( new PreFlight_Checks_SEO() );
+	'prelaunch_checker_register_categories',
+	static function ( Prelaunch_Checker_Core $core ): void {
+		$core->register_category( new Prelaunch_Checker_Checks_SEO() );
 	}
 );

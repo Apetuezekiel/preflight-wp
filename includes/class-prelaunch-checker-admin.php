@@ -2,7 +2,7 @@
 /**
  * Admin UI orchestrator: menu registration, tab routing, form handlers, AJAX.
  *
- * @package PreFlight
+ * @package Prelaunch_Checker
  * @since   0.3.0
  */
 
@@ -11,7 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Wires all WordPress admin hooks required by the PreFlight admin UI.
+ * Wires all WordPress admin hooks required by the Prelaunch Checker admin UI.
  *
  * Instantiated only inside is_admin() so no admin code runs on the frontend.
  * All state-changing actions (settings save, scan trigger, AJAX rescan) are
@@ -19,19 +19,19 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 0.3.0
  */
-class PreFlight_Admin {
+class Prelaunch_Checker_Admin {
 
-	/** @var PreFlight_Core */
+	/** @var Prelaunch_Checker_Core */
 	private $core;
 
-	/** @var PreFlight_History */
+	/** @var Prelaunch_Checker_History */
 	private $history;
 
 	/**
-	 * @param PreFlight_Core    $core    Injected scanner/registry access.
-	 * @param PreFlight_History $history Injected history service.
+	 * @param Prelaunch_Checker_Core    $core    Injected scanner/registry access.
+	 * @param Prelaunch_Checker_History $history Injected history service.
 	 */
-	public function __construct( PreFlight_Core $core, PreFlight_History $history ) {
+	public function __construct( Prelaunch_Checker_Core $core, Prelaunch_Checker_History $history ) {
 		$this->core    = $core;
 		$this->history = $history;
 
@@ -39,7 +39,7 @@ class PreFlight_Admin {
 		add_action( 'admin_init',             array( $this, 'handle_settings_save' ) );
 		add_action( 'admin_init',             array( $this, 'handle_scan_trigger' ) );
 		add_action( 'admin_enqueue_scripts',  array( $this, 'enqueue_assets' ) );
-		add_action( 'wp_ajax_preflight_rescan', array( $this, 'ajax_rescan' ) );
+		add_action( 'wp_ajax_prelaunch_checker_rescan', array( $this, 'ajax_rescan' ) );
 	}
 
 	// -------------------------------------------------------------------------
@@ -47,17 +47,17 @@ class PreFlight_Admin {
 	// -------------------------------------------------------------------------
 
 	/**
-	 * Register the PreFlight submenu under Tools.
+	 * Register the Prelaunch Checker submenu under Tools.
 	 *
 	 * @since  0.3.0
 	 */
 	public function register_menu(): void {
 		add_submenu_page(
 			'tools.php',
-			__( 'PreFlight', 'preflight-wp' ),
-			__( 'PreFlight', 'preflight-wp' ),
+			__( 'Prelaunch Checker', 'prelaunch-checker' ),
+			__( 'Prelaunch Checker', 'prelaunch-checker' ),
 			'manage_options',
-			'preflight',
+			'prelaunch-checker',
 			array( $this, 'render_page' )
 		);
 	}
@@ -69,21 +69,21 @@ class PreFlight_Admin {
 	 */
 	public function render_page(): void {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'You do not have permission to access this page.', 'preflight-wp' ) );
+			wp_die( esc_html__( 'You do not have permission to access this page.', 'prelaunch-checker' ) );
 		}
 
 		$active_tab = $this->get_active_tab();
-		$page_url   = admin_url( 'tools.php?page=preflight' );
+		$page_url   = admin_url( 'tools.php?page=prelaunch-checker' );
 
-		echo '<div class="wrap preflight-wrap">';
-		echo '<h1>' . esc_html__( 'PreFlight', 'preflight-wp' ) . '</h1>';
+		echo '<div class="wrap prelaunch-checker-wrap">';
+		echo '<h1>' . esc_html__( 'Prelaunch Checker', 'prelaunch-checker' ) . '</h1>';
 
 		// Inline ARIA live region — updated by JS during AJAX rescan.
-		echo '<div id="preflight-status" class="screen-reader-text" aria-live="polite" aria-atomic="true"></div>';
+		echo '<div id="prelaunch-checker-status" class="screen-reader-text" aria-live="polite" aria-atomic="true"></div>';
 
 		$this->render_tab_nav( $active_tab );
 
-		echo '<div class="preflight-tab-content">';
+		echo '<div class="prelaunch-checker-tab-content">';
 
 		switch ( $active_tab ) {
 			case 'history':
@@ -111,16 +111,16 @@ class PreFlight_Admin {
 	 * @since  0.3.0
 	 */
 	public function handle_settings_save(): void {
-		if ( ! isset( $_POST['preflight_settings_nonce'] ) ) {
+		if ( ! isset( $_POST['prelaunch_checker_settings_nonce'] ) ) {
 			return;
 		}
 
-		if ( ! wp_verify_nonce( sanitize_key( $_POST['preflight_settings_nonce'] ), 'preflight_save_settings' ) ) {
-			wp_die( esc_html__( 'Nonce verification failed.', 'preflight-wp' ) );
+		if ( ! wp_verify_nonce( sanitize_key( $_POST['prelaunch_checker_settings_nonce'] ), 'prelaunch_checker_save_settings' ) ) {
+			wp_die( esc_html__( 'Nonce verification failed.', 'prelaunch-checker' ) );
 		}
 
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'Insufficient permissions.', 'preflight-wp' ) );
+			wp_die( esc_html__( 'Insufficient permissions.', 'prelaunch-checker' ) );
 		}
 
 		// Collect all known check IDs from the registry.
@@ -152,12 +152,12 @@ class PreFlight_Admin {
 			'developer_info'  => $dev_info,
 		);
 
-		update_option( 'preflight_settings', $settings );
+		update_option( 'prelaunch_checker_settings', $settings );
 
 		wp_safe_redirect(
 			add_query_arg(
 				array(
-					'page'    => 'preflight',
+					'page'    => 'prelaunch-checker',
 					'tab'     => 'settings',
 					'updated' => '1',
 				),
@@ -173,16 +173,16 @@ class PreFlight_Admin {
 	 * @since  0.3.0
 	 */
 	public function handle_scan_trigger(): void {
-		if ( ! isset( $_POST['preflight_scan_nonce'] ) ) {
+		if ( ! isset( $_POST['prelaunch_checker_scan_nonce'] ) ) {
 			return;
 		}
 
-		if ( ! wp_verify_nonce( sanitize_key( $_POST['preflight_scan_nonce'] ), 'preflight_run_scan' ) ) {
-			wp_die( esc_html__( 'Nonce verification failed.', 'preflight-wp' ) );
+		if ( ! wp_verify_nonce( sanitize_key( $_POST['prelaunch_checker_scan_nonce'] ), 'prelaunch_checker_run_scan' ) ) {
+			wp_die( esc_html__( 'Nonce verification failed.', 'prelaunch-checker' ) );
 		}
 
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'Insufficient permissions.', 'preflight-wp' ) );
+			wp_die( esc_html__( 'Insufficient permissions.', 'prelaunch-checker' ) );
 		}
 
 		$envelope = $this->core->get_scanner()->run();
@@ -191,7 +191,7 @@ class PreFlight_Admin {
 		wp_safe_redirect(
 			add_query_arg(
 				array(
-					'page'    => 'preflight',
+					'page'    => 'prelaunch-checker',
 					'tab'     => 'dashboard',
 					'scanned' => '1',
 				),
@@ -202,40 +202,40 @@ class PreFlight_Admin {
 	}
 
 	/**
-	 * Enqueue admin CSS and JS, scoped to the PreFlight page only.
+	 * Enqueue admin CSS and JS, scoped to the Prelaunch Checker page only.
 	 *
 	 * @since  0.3.0
 	 * @param  string $hook Current admin page hook.
 	 */
 	public function enqueue_assets( string $hook ): void {
-		if ( 'tools_page_preflight' !== $hook ) {
+		if ( 'tools_page_prelaunch-checker' !== $hook ) {
 			return;
 		}
 
 		wp_enqueue_style(
-			'preflight-admin',
-			PREFLIGHT_URL . 'assets/css/admin.css',
+			'prelaunch-checker-admin',
+			PRELAUNCH_CHECKER_URL . 'assets/css/admin.css',
 			array(),
-			PREFLIGHT_VERSION
+			PRELAUNCH_CHECKER_VERSION
 		);
 
 		wp_enqueue_script(
-			'preflight-admin',
-			PREFLIGHT_URL . 'assets/js/admin.js',
+			'prelaunch-checker-admin',
+			PRELAUNCH_CHECKER_URL . 'assets/js/admin.js',
 			array(),
-			PREFLIGHT_VERSION,
+			PRELAUNCH_CHECKER_VERSION,
 			true
 		);
 
 		wp_localize_script(
-			'preflight-admin',
-			'preflight',
+			'prelaunch-checker-admin',
+			'prelaunchChecker',
 			array(
 				'ajaxUrl'   => admin_url( 'admin-ajax.php' ),
-				'rescanNonce' => wp_create_nonce( 'preflight_rescan' ),
-				'scanning'  => __( 'Scanning\xe2\x80\xa6', 'preflight-wp' ),
-				'rescan'    => __( 'Re-scan', 'preflight-wp' ),
-				'scanError' => __( 'Scan failed. Please try again.', 'preflight-wp' ),
+				'rescanNonce' => wp_create_nonce( 'prelaunch_checker_rescan' ),
+				'scanning'  => __( 'Scanning…', 'prelaunch-checker' ),
+				'rescan'    => __( 'Re-scan', 'prelaunch-checker' ),
+				'scanError' => __( 'Scan failed. Please try again.', 'prelaunch-checker' ),
 			)
 		);
 	}
@@ -246,10 +246,10 @@ class PreFlight_Admin {
 	 * @since  0.3.0
 	 */
 	public function ajax_rescan(): void {
-		check_ajax_referer( 'preflight_rescan', 'nonce' );
+		check_ajax_referer( 'prelaunch_checker_rescan', 'nonce' );
 
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_send_json_error( array( 'code' => 'forbidden', 'message' => __( 'Insufficient permissions.', 'preflight-wp' ) ) );
+			wp_send_json_error( array( 'code' => 'forbidden', 'message' => __( 'Insufficient permissions.', 'prelaunch-checker' ) ) );
 		}
 
 		$envelope = $this->core->get_scanner()->run();
@@ -291,14 +291,14 @@ class PreFlight_Admin {
 	 * @param  string $active Currently active tab slug.
 	 */
 	private function render_tab_nav( string $active ): void {
-		$base = admin_url( 'tools.php?page=preflight' );
+		$base = admin_url( 'tools.php?page=prelaunch-checker' );
 		$tabs = array(
-			'dashboard' => __( 'Dashboard', 'preflight-wp' ),
-			'history'   => __( 'History', 'preflight-wp' ),
-			'settings'  => __( 'Settings', 'preflight-wp' ),
+			'dashboard' => __( 'Dashboard', 'prelaunch-checker' ),
+			'history'   => __( 'History', 'prelaunch-checker' ),
+			'settings'  => __( 'Settings', 'prelaunch-checker' ),
 		);
 
-		echo '<nav class="nav-tab-wrapper" aria-label="' . esc_attr__( 'PreFlight tabs', 'preflight-wp' ) . '">';
+		echo '<nav class="nav-tab-wrapper" aria-label="' . esc_attr__( 'Prelaunch Checker tabs', 'prelaunch-checker' ) . '">';
 		foreach ( $tabs as $slug => $label ) {
 			$class = ( $slug === $active ) ? 'nav-tab nav-tab-active' : 'nav-tab';
 			$url   = add_query_arg( 'tab', $slug, $base );
@@ -335,7 +335,7 @@ class PreFlight_Admin {
 				wp_safe_redirect(
 					add_query_arg(
 						array(
-							'page'        => 'preflight',
+							'page'        => 'prelaunch-checker',
 							'tab'         => 'history',
 							'bad_index'   => '1',
 						),
@@ -355,11 +355,11 @@ class PreFlight_Admin {
 
 		// Success notice after synchronous scan.
 		if ( isset( $_GET['scanned'] ) && '1' === $_GET['scanned'] ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			echo '<div class="notice notice-success is-dismissible"><p>' . esc_html__( 'Scan complete.', 'preflight-wp' ) . '</p></div>';
+			echo '<div class="notice notice-success is-dismissible"><p>' . esc_html__( 'Scan complete.', 'prelaunch-checker' ) . '</p></div>';
 		}
 
-		$scan_action_url = admin_url( 'tools.php?page=preflight&tab=dashboard' );
-		$rescan_nonce    = wp_create_nonce( 'preflight_run_scan' );
+		$scan_action_url = admin_url( 'tools.php?page=prelaunch-checker&tab=dashboard' );
+		$rescan_nonce    = wp_create_nonce( 'prelaunch_checker_run_scan' );
 
 		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		echo $this->render_dashboard_partial( $envelope, $delta, $is_first_scan, $scan_action_url, $rescan_nonce, $is_historical );
@@ -386,14 +386,14 @@ class PreFlight_Admin {
 		bool $is_historical = false
 	): string {
 		if ( '' === $scan_action_url ) {
-			$scan_action_url = admin_url( 'tools.php?page=preflight&tab=dashboard' );
+			$scan_action_url = admin_url( 'tools.php?page=prelaunch-checker&tab=dashboard' );
 		}
 		if ( '' === $rescan_nonce ) {
-			$rescan_nonce = wp_create_nonce( 'preflight_run_scan' );
+			$rescan_nonce = wp_create_nonce( 'prelaunch_checker_run_scan' );
 		}
 
 		ob_start();
-		$template = PREFLIGHT_PATH . 'templates/dashboard.php';
+		$template = PRELAUNCH_CHECKER_PATH . 'templates/dashboard.php';
 		if ( file_exists( $template ) ) {
 			include $template;
 		}
@@ -407,7 +407,7 @@ class PreFlight_Admin {
 	 */
 	private function render_history_tab(): void {
 		$history  = $this->history->get_all();
-		$template = PREFLIGHT_PATH . 'templates/history.php';
+		$template = PRELAUNCH_CHECKER_PATH . 'templates/history.php';
 		if ( file_exists( $template ) ) {
 			include $template;
 		}
@@ -448,12 +448,12 @@ class PreFlight_Admin {
 	 */
 	private function render_settings_tab(): void {
 		if ( isset( $_GET['updated'] ) && '1' === $_GET['updated'] ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			echo '<div class="notice notice-success is-dismissible"><p>' . esc_html__( 'Settings saved.', 'preflight-wp' ) . '</p></div>';
+			echo '<div class="notice notice-success is-dismissible"><p>' . esc_html__( 'Settings saved.', 'prelaunch-checker' ) . '</p></div>';
 		}
 
-		$settings   = (array) get_option( 'preflight_settings', array() );
+		$settings   = (array) get_option( 'prelaunch_checker_settings', array() );
 		$categories = $this->core->get_categories();
-		$template   = PREFLIGHT_PATH . 'templates/settings.php';
+		$template   = PRELAUNCH_CHECKER_PATH . 'templates/settings.php';
 		if ( file_exists( $template ) ) {
 			include $template;
 		}

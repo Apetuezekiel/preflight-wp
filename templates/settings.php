@@ -3,15 +3,15 @@
  * Settings tab template.
  *
  * Receives in scope:
- *   $settings   (array)                      — current preflight_settings option.
- *   $categories (PreFlight_Check_Category[]) — all registered categories.
+ *   $settings   (array)                      — current prelaunch_checker_settings option.
+ *   $categories (Prelaunch_Checker_Check_Category[]) — all registered categories.
  *
  * Checkbox logic: checked = check is ENABLED (intuitive UX).
- * The save handler (PreFlight_Admin::handle_settings_save) collects enabled_checks[]
+ * The save handler (Prelaunch_Checker_Admin::handle_settings_save) collects enabled_checks[]
  * and computes disabled = all_check_ids - enabled_checks, storing the result in
- * preflight_settings['disabled_checks'] (Brief §3.6, §5.3).
+ * prelaunch_checker_settings['disabled_checks'] (Brief §3.6, §5.3).
  *
- * @package PreFlight
+ * @package Prelaunch_Checker
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -21,16 +21,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 // phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- template-scoped variables injected by the calling render method.
 $disabled_checks = isset( $settings['disabled_checks'] ) ? (array) $settings['disabled_checks'] : array();
 $dev_info        = isset( $settings['developer_info'] ) ? (array) $settings['developer_info'] : array();
-$form_action     = admin_url( 'tools.php?page=preflight&tab=settings' );
+$form_action     = admin_url( 'tools.php?page=prelaunch-checker&tab=settings' );
 ?>
-<div class="preflight-settings">
+<div class="prelaunch-checker-settings">
 	<form method="post" action="<?php echo esc_url( $form_action ); ?>">
-		<?php wp_nonce_field( 'preflight_save_settings', 'preflight_settings_nonce' ); ?>
+		<?php wp_nonce_field( 'prelaunch_checker_save_settings', 'prelaunch_checker_settings_nonce' ); ?>
 
 		<?php /* Check toggles section */ ?>
-		<h2><?php esc_html_e( 'Check Toggles', 'preflight-wp' ); ?></h2>
+		<h2><?php esc_html_e( 'Check Toggles', 'prelaunch-checker' ); ?></h2>
 		<p class="description">
-			<?php esc_html_e( 'Uncheck a box to disable that check. Disabled checks are skipped during scans.', 'preflight-wp' ); ?>
+			<?php esc_html_e( 'Uncheck a box to disable that check. Disabled checks are skipped during scans.', 'prelaunch-checker' ); ?>
 		</p>
 
 		<?php foreach ( $categories as $category ) : ?>
@@ -41,13 +41,13 @@ $form_action     = admin_url( 'tools.php?page=preflight&tab=settings' );
 					echo esc_html(
 						sprintf(
 							/* translators: %s: category label */
-							__( 'Checks in category: %s', 'preflight-wp' ),
+							__( 'Checks in category: %s', 'prelaunch-checker' ),
 							$category->get_category_label()
 						)
 					);
 					?>
 				</legend>
-				<ul class="preflight-check-list">
+				<ul class="prelaunch-checker-check-list">
 				<?php foreach ( $category->get_check_ids() as $check_id ) : ?>
 					<?php
 					// get_check() instantiates the check for label/severity metadata only.
@@ -57,11 +57,11 @@ $form_action     = admin_url( 'tools.php?page=preflight&tab=settings' );
 						continue;
 					}
 					$is_enabled = ! in_array( $check_id, $disabled_checks, true );
-					$field_id   = 'preflight-check-' . esc_attr( str_replace( '.', '-', $check_id ) );
+					$field_id   = 'prelaunch-checker-check-' . esc_attr( str_replace( '.', '-', $check_id ) );
 					$severity   = $check->get_default_severity();
 					?>
-					<li class="preflight-check-list__item">
-						<label for="<?php echo esc_attr( $field_id ); ?>" class="preflight-check-list__label">
+					<li class="prelaunch-checker-check-list__item">
+						<label for="<?php echo esc_attr( $field_id ); ?>" class="prelaunch-checker-check-list__label">
 							<input
 								type="checkbox"
 								id="<?php echo esc_attr( $field_id ); ?>"
@@ -69,11 +69,11 @@ $form_action     = admin_url( 'tools.php?page=preflight&tab=settings' );
 								value="<?php echo esc_attr( $check_id ); ?>"
 								<?php checked( $is_enabled ); ?>
 							>
-							<span class="preflight-check-list__name"><?php echo esc_html( $check->get_label() ); ?></span>
-							<span class="preflight-severity-pill preflight-severity-pill--<?php echo esc_attr( $severity ); ?> preflight-severity-pill--sm">
+							<span class="prelaunch-checker-check-list__name"><?php echo esc_html( $check->get_label() ); ?></span>
+							<span class="prelaunch-checker-severity-pill prelaunch-checker-severity-pill--<?php echo esc_attr( $severity ); ?> prelaunch-checker-severity-pill--sm">
 								<?php echo esc_html( strtoupper( $severity ) ); ?>
 							</span>
-							<code class="preflight-check-list__id"><?php echo esc_html( $check_id ); ?></code>
+							<code class="prelaunch-checker-check-list__id"><?php echo esc_html( $check_id ); ?></code>
 						</label>
 					</li>
 				<?php endforeach; ?>
@@ -82,14 +82,14 @@ $form_action     = admin_url( 'tools.php?page=preflight&tab=settings' );
 		<?php endforeach; ?>
 
 		<?php /* Developer info section */ ?>
-		<h2><?php esc_html_e( 'Developer Info', 'preflight-wp' ); ?></h2>
+		<h2><?php esc_html_e( 'Developer Info', 'prelaunch-checker' ); ?></h2>
 		<p class="description">
-			<?php esc_html_e( 'Optional. Included in scan reports (Phase 3).', 'preflight-wp' ); ?>
+			<?php esc_html_e( 'Optional. Included in scan reports (Phase 3).', 'prelaunch-checker' ); ?>
 		</p>
 		<table class="form-table" role="presentation">
 			<tr>
 				<th scope="row">
-					<label for="developer-name"><?php esc_html_e( 'Your name', 'preflight-wp' ); ?></label>
+					<label for="developer-name"><?php esc_html_e( 'Your name', 'prelaunch-checker' ); ?></label>
 				</th>
 				<td>
 					<input
@@ -104,7 +104,7 @@ $form_action     = admin_url( 'tools.php?page=preflight&tab=settings' );
 			</tr>
 			<tr>
 				<th scope="row">
-					<label for="developer-email"><?php esc_html_e( 'Your email', 'preflight-wp' ); ?></label>
+					<label for="developer-email"><?php esc_html_e( 'Your email', 'prelaunch-checker' ); ?></label>
 				</th>
 				<td>
 					<input
@@ -119,7 +119,7 @@ $form_action     = admin_url( 'tools.php?page=preflight&tab=settings' );
 			</tr>
 			<tr>
 				<th scope="row">
-					<label for="developer-url"><?php esc_html_e( 'Your URL', 'preflight-wp' ); ?></label>
+					<label for="developer-url"><?php esc_html_e( 'Your URL', 'prelaunch-checker' ); ?></label>
 				</th>
 				<td>
 					<input
@@ -135,7 +135,7 @@ $form_action     = admin_url( 'tools.php?page=preflight&tab=settings' );
 		</table>
 
 		<p class="submit">
-			<button type="submit" class="button button-primary"><?php esc_html_e( 'Save Settings', 'preflight-wp' ); ?></button>
+			<button type="submit" class="button button-primary"><?php esc_html_e( 'Save Settings', 'prelaunch-checker' ); ?></button>
 		</p>
 	</form>
 </div>

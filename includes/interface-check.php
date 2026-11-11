@@ -2,7 +2,7 @@
 /**
  * Severity/status constants, result value object, and check contracts.
  *
- * @package PreFlight
+ * @package Prelaunch_Checker
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -10,24 +10,24 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Severity constants (§3.1).
-define( 'PREFLIGHT_SEVERITY_BLOCKER', 'blocker' );
-define( 'PREFLIGHT_SEVERITY_WARNING', 'warning' );
-define( 'PREFLIGHT_SEVERITY_INFO',    'info' );
+define( 'PRELAUNCH_CHECKER_SEVERITY_BLOCKER', 'blocker' );
+define( 'PRELAUNCH_CHECKER_SEVERITY_WARNING', 'warning' );
+define( 'PRELAUNCH_CHECKER_SEVERITY_INFO',    'info' );
 
 // Status constants (§3.3).
-define( 'PREFLIGHT_STATUS_PASS', 'pass' );
-define( 'PREFLIGHT_STATUS_FAIL', 'fail' );
-define( 'PREFLIGHT_STATUS_SKIP', 'skip' );
+define( 'PRELAUNCH_CHECKER_STATUS_PASS', 'pass' );
+define( 'PRELAUNCH_CHECKER_STATUS_FAIL', 'fail' );
+define( 'PRELAUNCH_CHECKER_STATUS_SKIP', 'skip' );
 
 /**
- * Immutable result value object returned by every PreFlight_Check::run() call.
+ * Immutable result value object returned by every Prelaunch_Checker_Check::run() call.
  *
  * Properties are public for array serialisation into scan history but must not
  * be mutated after construction. Use the static factory methods to create instances.
  * PHP 7.4 does not support readonly properties (added in 8.1); immutability is
  * enforced via the private constructor.
  */
-final class PreFlight_Check_Result {
+final class Prelaunch_Checker_Check_Result {
 
 	/** @var string pass|fail|skip */
 	public $status;
@@ -45,15 +45,15 @@ final class PreFlight_Check_Result {
 	}
 
 	public static function pass(): self {
-		return new self( PREFLIGHT_STATUS_PASS, '', '' );
+		return new self( PRELAUNCH_CHECKER_STATUS_PASS, '', '' );
 	}
 
 	public static function fail( string $message, string $fix_hint ): self {
-		return new self( PREFLIGHT_STATUS_FAIL, $message, $fix_hint );
+		return new self( PRELAUNCH_CHECKER_STATUS_FAIL, $message, $fix_hint );
 	}
 
 	public static function skip( string $message ): self {
-		return new self( PREFLIGHT_STATUS_SKIP, $message, '' );
+		return new self( PRELAUNCH_CHECKER_STATUS_SKIP, $message, '' );
 	}
 }
 
@@ -66,7 +66,7 @@ final class PreFlight_Check_Result {
  * Category prefixes are stable. Recategorising a check requires migrating its ID
  * so that scan history comparison (§3.5) remains valid across the rename.
  */
-interface PreFlight_Check {
+interface Prelaunch_Checker_Check {
 
 	/**
 	 * Namespaced check identifier: '{category-id}.{check-slug}'.
@@ -78,7 +78,7 @@ interface PreFlight_Check {
 	public function get_label(): string;
 
 	/**
-	 * One of PREFLIGHT_SEVERITY_BLOCKER, PREFLIGHT_SEVERITY_WARNING, or PREFLIGHT_SEVERITY_INFO.
+	 * One of PRELAUNCH_CHECKER_SEVERITY_BLOCKER, PRELAUNCH_CHECKER_SEVERITY_WARNING, or PRELAUNCH_CHECKER_SEVERITY_INFO.
 	 *
 	 * @return string
 	 */
@@ -89,9 +89,9 @@ interface PreFlight_Check {
 	 *
 	 * Must never throw — all exceptions are caught by the scanner (§5.2).
 	 *
-	 * @return PreFlight_Check_Result
+	 * @return Prelaunch_Checker_Check_Result
 	 */
-	public function run(): PreFlight_Check_Result;
+	public function run(): Prelaunch_Checker_Check_Result;
 }
 
 /**
@@ -101,7 +101,7 @@ interface PreFlight_Check {
  * constructing check objects. get_check() instantiates on demand — only during
  * an active scan, never during admin page rendering.
  */
-interface PreFlight_Check_Category {
+interface Prelaunch_Checker_Check_Category {
 
 	/** @return string e.g. 'wp-config' */
 	public function get_category_id(): string;
@@ -111,7 +111,7 @@ interface PreFlight_Check_Category {
 	/**
 	 * Return all namespaced check IDs this category owns.
 	 *
-	 * Must not instantiate PreFlight_Check objects.
+	 * Must not instantiate Prelaunch_Checker_Check objects.
 	 *
 	 * @return string[]
 	 */
@@ -121,7 +121,7 @@ interface PreFlight_Check_Category {
 	 * Instantiate and return the check for the given ID, or null if unknown.
 	 *
 	 * @param string $id Namespaced check ID.
-	 * @return PreFlight_Check|null
+	 * @return Prelaunch_Checker_Check|null
 	 */
-	public function get_check( string $id ): ?PreFlight_Check;
+	public function get_check( string $id ): ?Prelaunch_Checker_Check;
 }

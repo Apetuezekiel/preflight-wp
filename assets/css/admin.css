@@ -1,5 +1,5 @@
 /*
- * PreFlight admin styles — WCAG AA compliant.
+ * Prelaunch Checker admin styles — WCAG AA compliant.
  *
  * Severity is conveyed by label text AND color (Brief Constraint 12).
  * Color palette: WP admin system colors.
@@ -10,11 +10,11 @@
  * Wrap and tab content
  * ---------------------------------------------------------------------- */
 
-.preflight-wrap {
+.prelaunch-checker-wrap {
 	max-width: 1200px;
 }
 
-.preflight-tab-content {
+.prelaunch-checker-tab-content {
 	margin-top: 1.5rem;
 }
 
@@ -27,7 +27,7 @@
  * #757575 gray on white  = 4.54:1 ✓
  * ---------------------------------------------------------------------- */
 
-.preflight-severity-pill {
+.prelaunch-checker-severity-pill {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
@@ -41,32 +41,32 @@
 	line-height: 1.6;
 }
 
-.preflight-severity-pill--blocker {
+.prelaunch-checker-severity-pill--blocker {
 	background-color: #d63638;
 	color: #fff;
 }
 
-.preflight-severity-pill--warning {
+.prelaunch-checker-severity-pill--warning {
 	background-color: #dba617;
 	color: #1d2327; /* dark text — #dba617 bg / #1d2327 fg = 6.18:1 ✓ */
 }
 
-.preflight-severity-pill--info {
+.prelaunch-checker-severity-pill--info {
 	background-color: #2271b1;
 	color: #fff;
 }
 
-.preflight-severity-pill--pass {
+.prelaunch-checker-severity-pill--pass {
 	background-color: #007a1f;
 	color: #fff;
 }
 
-.preflight-severity-pill--skip {
+.prelaunch-checker-severity-pill--skip {
 	background-color: #757575;
 	color: #fff;
 }
 
-.preflight-severity-pill--sm {
+.prelaunch-checker-severity-pill--sm {
 	font-size: 10px;
 	padding: 1px 5px;
 }
@@ -75,7 +75,7 @@
  * Summary bar
  * ---------------------------------------------------------------------- */
 
-.preflight-summary {
+.prelaunch-checker-summary {
 	display: flex;
 	align-items: center;
 	gap: 1.5rem;
@@ -87,12 +87,12 @@
 	flex-wrap: wrap;
 }
 
-.preflight-summary__meta {
+.prelaunch-checker-summary__meta {
 	color: #50575e;
 	font-size: 13px;
 }
 
-.preflight-summary__counts {
+.prelaunch-checker-summary__counts {
 	display: flex;
 	gap: 1rem;
 	list-style: none;
@@ -101,13 +101,13 @@
 	flex-wrap: wrap;
 }
 
-.preflight-summary__count {
+.prelaunch-checker-summary__count {
 	display: flex;
 	align-items: center;
 	gap: 0.4rem;
 }
 
-.preflight-count-value {
+.prelaunch-checker-count-value {
 	font-size: 18px;
 	font-weight: 700;
 	color: #1d2327;
@@ -119,7 +119,7 @@
  * Delta bar
  * ---------------------------------------------------------------------- */
 
-.preflight-delta {
+.prelaunch-checker-delta {
 	display: flex;
 	gap: 1rem;
 	margin-bottom: 1rem;
@@ -127,17 +127,17 @@
 	flex-wrap: wrap;
 }
 
-.preflight-delta__new {
+.prelaunch-checker-delta__new {
 	color: #d63638;
 	font-weight: 600;
 }
 
-.preflight-delta__resolved {
+.prelaunch-checker-delta__resolved {
 	color: #007a1f;
 	font-weight: 600;
 }
 
-.preflight-delta__unchanged {
+.prelaunch-checker-delta__unchanged {
 	color: #50575e;
 }
 
@@ -145,7 +145,7 @@
  * Actions
  * ---------------------------------------------------------------------- */
 
-.preflight-actions {
+.prelaunch-checker-actions {
 	margin-bottom: 1.5rem;
 }
 
@@ -153,22 +153,22 @@
  * Category sections — collapsible
  * ---------------------------------------------------------------------- */
 
-.preflight-category {
+.prelaunch-checker-category {
 	border: 1px solid #c3c4c7;
 	border-radius: 4px;
 	margin-bottom: 1rem;
 	overflow: hidden;
 }
 
-.preflight-category__header {
+.prelaunch-checker-category__header {
 	margin: 0;
 	background: #f6f7f7;
 	border-bottom: 1px solid #c3c4c7;
 }
 
 /* WAI-ARIA disclosure button inside the h2 — takes all interactive styles.
- * Focus outline comes from the general .preflight-wrap button:focus-visible rule. */
-.preflight-category__toggle {
+ * Focus outline comes from the general .prelaunch-checker-wrap button:focus-visible rule. */
+.prelaunch-checker-category__toggle {
 	display: flex;
 	align-items: center;
 	gap: 0.5rem;
@@ -184,7 +184,7 @@
 	text-align: left;
 }
 
-.preflight-category__chevron {
+.prelaunch-checker-category__chevron {
 	display: inline-block;
 	width: 0;
 	height: 0;
@@ -195,15 +195,15 @@
 	flex-shrink: 0;
 }
 
-.preflight-category.is-expanded .preflight-category__chevron {
+.prelaunch-checker-category.is-expanded .prelaunch-checker-category__chevron {
 	transform: rotate(0deg);
 }
 
-.preflight-category:not(.is-expanded) .preflight-category__chevron {
+.prelaunch-checker-category:not(.is-expanded) .prelaunch-checker-category__chevron {
 	transform: rotate(-90deg);
 }
 
-.preflight-category__badge {
+.prelaunch-checker-category__badge {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
@@ -218,11 +218,11 @@
 	margin-left: auto;
 }
 
-.preflight-category__body {
+.prelaunch-checker-category__body {
 	display: none;
 }
 
-.preflight-category.is-expanded .preflight-category__body {
+.prelaunch-checker-category.is-expanded .prelaunch-checker-category__body {
 	display: block;
 }
 
@@ -230,38 +230,38 @@
  * Results table
  * ---------------------------------------------------------------------- */
 
-.preflight-results-table {
+.prelaunch-checker-results-table {
 	margin: 0;
 	border: none;
 }
 
-.preflight-results-table th,
-.preflight-results-table td {
+.prelaunch-checker-results-table th,
+.prelaunch-checker-results-table td {
 	vertical-align: middle;
 	padding: 0.5rem 0.75rem;
 }
 
-.preflight-col-severity {
+.prelaunch-checker-col-severity {
 	width: 120px;
 }
 
-.preflight-col-check {
+.prelaunch-checker-col-check {
 	width: 260px;
 	font-weight: 500;
 }
 
-.preflight-fix-hint {
+.prelaunch-checker-fix-hint {
 	margin: 0.25rem 0 0;
 	color: #50575e;
 	font-size: 12px;
 }
 
-.preflight-skip-message {
+.prelaunch-checker-skip-message {
 	color: #757575;
 	font-size: 12px;
 }
 
-.preflight-pass-message {
+.prelaunch-checker-pass-message {
 	color: #007a1f;
 	font-size: 12px;
 }
@@ -270,20 +270,20 @@
  * History table
  * ---------------------------------------------------------------------- */
 
-.preflight-history-row {
+.prelaunch-checker-history-row {
 	cursor: pointer;
 }
 
-.preflight-history-row:hover td {
+.prelaunch-checker-history-row:hover td {
 	background-color: #f0f0f1;
 }
 
-.preflight-history-row:focus-visible {
+.prelaunch-checker-history-row:focus-visible {
 	outline: 2px solid #2271b1;
 	outline-offset: -2px;
 }
 
-.preflight-history-row--latest td:first-child {
+.prelaunch-checker-history-row--latest td:first-child {
 	font-weight: 600;
 }
 
@@ -291,34 +291,34 @@
  * Settings page
  * ---------------------------------------------------------------------- */
 
-.preflight-check-list {
+.prelaunch-checker-check-list {
 	margin: 0;
 	padding: 0;
 	list-style: none;
 }
 
-.preflight-check-list__item {
+.prelaunch-checker-check-list__item {
 	margin-bottom: 0.5rem;
 }
 
-.preflight-check-list__label {
+.prelaunch-checker-check-list__label {
 	display: flex;
 	align-items: center;
 	gap: 0.5rem;
 	cursor: pointer;
 }
 
-.preflight-check-list__label:focus-within {
+.prelaunch-checker-check-list__label:focus-within {
 	outline: 2px solid #2271b1;
 	outline-offset: 2px;
 	border-radius: 2px;
 }
 
-.preflight-check-list__name {
+.prelaunch-checker-check-list__name {
 	font-weight: 500;
 }
 
-.preflight-check-list__id {
+.prelaunch-checker-check-list__id {
 	color: #50575e;
 	font-size: 11px;
 	margin-left: auto;
@@ -328,7 +328,7 @@
  * Empty state
  * ---------------------------------------------------------------------- */
 
-.preflight-empty-state {
+.prelaunch-checker-empty-state {
 	padding: 2rem;
 	text-align: center;
 	background: #f6f7f7;
@@ -336,7 +336,7 @@
 	border-radius: 4px;
 }
 
-.preflight-empty-state__lead {
+.prelaunch-checker-empty-state__lead {
 	font-size: 15px;
 	margin-bottom: 1.25rem;
 	color: #1d2327;
@@ -346,11 +346,11 @@
  * Focus indicators — all interactive elements
  * ---------------------------------------------------------------------- */
 
-.preflight-wrap a:focus-visible,
-.preflight-wrap button:focus-visible,
-.preflight-wrap input:focus-visible,
-.preflight-wrap select:focus-visible,
-.preflight-wrap textarea:focus-visible {
+.prelaunch-checker-wrap a:focus-visible,
+.prelaunch-checker-wrap button:focus-visible,
+.prelaunch-checker-wrap input:focus-visible,
+.prelaunch-checker-wrap select:focus-visible,
+.prelaunch-checker-wrap textarea:focus-visible {
 	outline: 2px solid #2271b1;
 	outline-offset: 2px;
 }
