@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-11-11T07:06:35+00:00\n"
+"POT-Creation-Date: 2026-11-11T07:17:19+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: prelaunch-checker\n"
@@ -453,87 +453,87 @@ msgstr ""
 msgid "wp-config.php: set define('WP_DEBUG', false); for production."
 msgstr ""
 
-#: includes/checks/class-checks-wp-config.php:205
-msgid "WP_DEBUG_DISPLAY is enabled; PHP errors will print to page output when WP_DEBUG is also enabled."
+#: includes/checks/class-checks-wp-config.php:208
+msgid "WP_DEBUG and WP_DEBUG_DISPLAY are both enabled, so PHP errors print on the page for every visitor."
 msgstr ""
 
-#: includes/checks/class-checks-wp-config.php:206
+#: includes/checks/class-checks-wp-config.php:209
 msgid "wp-config.php: set define('WP_DEBUG_DISPLAY', false); before any WP_DEBUG definition."
 msgstr ""
 
 #. translators: %s: relative file path
-#: includes/checks/class-checks-wp-config.php:231
+#: includes/checks/class-checks-wp-config.php:234
 #, php-format
 msgid "Debug log file exists at %s. HTTP accessibility cannot be verified without loopback (Phase 5)."
 msgstr ""
 
-#: includes/checks/class-checks-wp-config.php:234
+#: includes/checks/class-checks-wp-config.php:237
 msgid "Delete the log file, or move it outside the webroot, or block public access at the server level. Set WP_DEBUG_LOG to false in wp-config.php."
 msgstr ""
 
-#: includes/checks/class-checks-wp-config.php:267
+#: includes/checks/class-checks-wp-config.php:270
 msgid "Timezone is set as a UTC offset only; DST transitions will not be applied automatically."
 msgstr ""
 
-#: includes/checks/class-checks-wp-config.php:268
+#: includes/checks/class-checks-wp-config.php:271
 msgid "Settings → General → Timezone: select a named city (e.g., \"America/New_York\") instead of a UTC offset."
 msgstr ""
 
-#: includes/checks/class-checks-wp-config.php:283
+#: includes/checks/class-checks-wp-config.php:286
 msgid "Permalinks are set to Plain; URLs use ?p=123 query strings."
 msgstr ""
 
-#: includes/checks/class-checks-wp-config.php:284
+#: includes/checks/class-checks-wp-config.php:287
 msgid "Settings → Permalinks: select any structure other than Plain (recommended: Post name)."
 msgstr ""
 
-#: includes/checks/class-checks-wp-config.php:311
+#: includes/checks/class-checks-wp-config.php:314
 msgid "Site URL and Home URL differ in scheme or host."
 msgstr ""
 
-#: includes/checks/class-checks-wp-config.php:312
+#: includes/checks/class-checks-wp-config.php:315
 msgid "If WordPress is intentionally installed at a separate location from the public site root, suppress this check. Otherwise, Settings → General: align both URLs to the production domain."
 msgstr ""
 
 #. translators: %s: site URL hostname
-#: includes/checks/class-checks-wp-config.php:356
+#: includes/checks/class-checks-wp-config.php:359
 #, php-format
 msgid "Site URL host \"%s\" matches a known staging or local-development pattern."
 msgstr ""
 
-#: includes/checks/class-checks-wp-config.php:359
+#: includes/checks/class-checks-wp-config.php:362
 msgid "Update Site URL and Home URL to the production domain before launch. If this IS the production site, suppress this check."
 msgstr ""
 
 #. translators: %s: site URL hostname
-#: includes/checks/class-checks-wp-config.php:381
+#: includes/checks/class-checks-wp-config.php:384
 #, php-format
 msgid "Site URL host \"%s\" contains a generic development/staging substring."
 msgstr ""
 
-#: includes/checks/class-checks-wp-config.php:384
+#: includes/checks/class-checks-wp-config.php:387
 msgid "If this substring is part of the legitimate production domain, suppress this check. Otherwise, update Site URL and Home URL to the production domain."
 msgstr ""
 
 #. translators: %s: comma-separated list of URL sources checked
-#: includes/checks/class-checks-wp-config.php:422
+#: includes/checks/class-checks-wp-config.php:425
 #, php-format
 msgid "URL schemes are not consistent across %s."
 msgstr ""
 
-#: includes/checks/class-checks-wp-config.php:425
+#: includes/checks/class-checks-wp-config.php:428
 msgid "Align all URL schemes to https for production. Update wp-config.php if WP_CONTENT_URL is explicitly defined."
 msgstr ""
 
-#: includes/checks/class-checks-wp-config.php:465
+#: includes/checks/class-checks-wp-config.php:468
 msgid "Cannot evaluate auto-update filters without the update_core transient. Visit Dashboard → Updates to trigger WordPress's update check, then re-run the scan."
 msgstr ""
 
-#: includes/checks/class-checks-wp-config.php:482
+#: includes/checks/class-checks-wp-config.php:485
 msgid "Automatic updates for WordPress core are disabled."
 msgstr ""
 
-#: includes/checks/class-checks-wp-config.php:483
+#: includes/checks/class-checks-wp-config.php:486
 msgid "If updates are managed manually (e.g., via a deployment pipeline), this is informational only. Otherwise, remove AUTOMATIC_UPDATER_DISABLED or WP_AUTO_UPDATE_CORE constants from wp-config.php."
 msgstr ""
 

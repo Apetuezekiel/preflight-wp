@@ -8,7 +8,7 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ## v1.0.0 — 2026-05-17
 
-Renamed from PreFlight to Prelaunch Checker before the first public release (2026-11-11): display name, slug and text domain `prelaunch-checker`, and all code prefixes. Tested up to WordPress 7.1.
+Renamed from PreFlight to Prelaunch Checker before the first public release (2026-11-11): display name, slug and text domain `prelaunch-checker`, and all code prefixes. Tested up to WordPress 7.1. The "WP_DEBUG_DISPLAY enabled" check now fails only when WP_DEBUG is also on; WordPress defines WP_DEBUG_DISPLAY as true by default, so it used to flag every default install.
 
 First stable release. 35 checks across 7 categories, admin UI with dashboard/history/settings tabs, scan history with delta comparison, WCAG AA–compliant interface, i18n-ready (.pot included).
 

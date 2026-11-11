@@ -194,15 +194,18 @@ class Prelaunch_Checker_Checks_WP_Config implements Prelaunch_Checker_Check_Cate
 	/**
 	 * Check: WP_DEBUG_DISPLAY enabled. (Blocker)
 	 *
-	 * Reported even when WP_DEBUG is false — enabling WP_DEBUG later would
-	 * immediately leak errors to page output if WP_DEBUG_DISPLAY is already true.
+	 * Fails only when errors actually print: WordPress core defines
+	 * WP_DEBUG_DISPLAY as true whenever wp-config.php leaves it unset
+	 * (wp_initial_constants), and wp_debug_mode() applies it only while
+	 * WP_DEBUG is true. Checking WP_DEBUG_DISPLAY alone flagged every
+	 * default install as a blocker.
 	 *
 	 * @return Prelaunch_Checker_Check_Result
 	 */
 	public function check_wp_debug_display(): Prelaunch_Checker_Check_Result {
-		if ( defined( 'WP_DEBUG_DISPLAY' ) && WP_DEBUG_DISPLAY === true ) {
+		if ( defined( 'WP_DEBUG' ) && WP_DEBUG === true && defined( 'WP_DEBUG_DISPLAY' ) && WP_DEBUG_DISPLAY === true ) {
 			return Prelaunch_Checker_Check_Result::fail(
-				__( 'WP_DEBUG_DISPLAY is enabled; PHP errors will print to page output when WP_DEBUG is also enabled.', 'prelaunch-checker' ),
+				__( 'WP_DEBUG and WP_DEBUG_DISPLAY are both enabled, so PHP errors print on the page for every visitor.', 'prelaunch-checker' ),
 				__( 'wp-config.php: set define(\'WP_DEBUG_DISPLAY\', false); before any WP_DEBUG definition.', 'prelaunch-checker' )
 			);
 		}
