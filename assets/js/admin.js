@@ -1,74 +1,69 @@
 /**
- * PreFlight admin JS — keyboard-accessible expand/collapse + AJAX rescan.
+ * Prelaunch Checker admin JS — keyboard-accessible expand/collapse + AJAX rescan.
  *
  * Vanilla JS. No jQuery. ES5-compatible for broad browser support.
  */
 
-/* global preflight */
+/* global prelaunchChecker */
 
 document.addEventListener( 'DOMContentLoaded', function () {
 
+	var statusEl  = document.getElementById( 'prelaunch-checker-status' );
+	var dashboard = document.getElementById( 'prelaunch-checker-dashboard' );
+
+	if ( ! dashboard ) {
+		return;
+	}
+
 	// -------------------------------------------------------------------------
-	// Category expand / collapse
+	// Category expand / collapse — delegated to #prelaunch-checker-dashboard so it
+	// survives innerHTML replacement after each AJAX rescan.
+	// Keyboard (Enter / Space) is handled natively by the <button> element;
+	// no custom keydown handler needed.
 	// -------------------------------------------------------------------------
 
-	var headers = document.querySelectorAll( '.preflight-category__header' );
-
-	function toggleCategory( header ) {
-		var section  = header.closest( '.preflight-category' );
+	function toggleCategory( toggle ) {
+		var section  = toggle.closest( '.prelaunch-checker-category' );
 		var expanded = section.classList.contains( 'is-expanded' );
-		var bodyId   = header.getAttribute( 'aria-controls' );
+		var bodyId   = toggle.getAttribute( 'aria-controls' );
 		var body     = bodyId ? document.getElementById( bodyId ) : null;
 
 		if ( expanded ) {
 			section.classList.remove( 'is-expanded' );
-			header.setAttribute( 'aria-expanded', 'false' );
+			toggle.setAttribute( 'aria-expanded', 'false' );
 			if ( body ) {
 				body.style.display = 'none';
 			}
 		} else {
 			section.classList.add( 'is-expanded' );
-			header.setAttribute( 'aria-expanded', 'true' );
+			toggle.setAttribute( 'aria-expanded', 'true' );
 			if ( body ) {
 				body.style.display = '';
 			}
 		}
 	}
 
-	for ( var i = 0; i < headers.length; i++ ) {
-		( function ( header ) {
-			header.addEventListener( 'click', function () {
-				toggleCategory( header );
-			} );
-
-			header.addEventListener( 'keydown', function ( e ) {
-				if ( e.key === 'Enter' || e.key === ' ' ) {
-					e.preventDefault();
-					toggleCategory( header );
-				}
-			} );
-		} )( headers[ i ] );
-	}
-
 	// -------------------------------------------------------------------------
-	// AJAX rescan — delegated to stable #preflight-dashboard parent so the
-	// listener survives innerHTML replacement after each scan.
+	// Delegated click handler — covers category toggles AND the AJAX rescan
+	// button. Both targets survive innerHTML replacement because the listener
+	// is on the stable #prelaunch-checker-dashboard parent.
 	// -------------------------------------------------------------------------
-
-	var statusEl  = document.getElementById( 'preflight-status' );
-	var dashboard = document.getElementById( 'preflight-dashboard' );
-
-	if ( ! dashboard ) {
-		return;
-	}
 
 	dashboard.addEventListener( 'click', function ( e ) {
-		var btn = e.target.closest( '#preflight-rescan-btn' );
+
+		// Category expand / collapse.
+		var toggle = e.target.closest( '.prelaunch-checker-category__toggle' );
+		if ( toggle ) {
+			toggleCategory( toggle );
+			return;
+		}
+
+		// AJAX rescan.
+		var btn = e.target.closest( '#prelaunch-checker-rescan-btn' );
 		if ( ! btn ) {
 			return;
 		}
 
-		// Only intercept if fetch is available.
 		if ( typeof fetch === 'undefined' ) {
 			return;
 		}
@@ -76,17 +71,17 @@ document.addEventListener( 'DOMContentLoaded', function () {
 		e.preventDefault();
 
 		btn.disabled    = true;
-		btn.textContent = ( preflight && preflight.scanning ) ? preflight.scanning : 'Scanning…';
+		btn.textContent = ( prelaunchChecker && prelaunchChecker.scanning ) ? prelaunchChecker.scanning : 'Scanning…';
 
 		if ( statusEl ) {
-			statusEl.textContent = ( preflight && preflight.scanning ) ? preflight.scanning : 'Scanning…';
+			statusEl.textContent = ( prelaunchChecker && prelaunchChecker.scanning ) ? prelaunchChecker.scanning : 'Scanning…';
 		}
 
 		var formData = new FormData();
-		formData.append( 'action', 'preflight_rescan' );
-		formData.append( 'nonce', ( preflight && preflight.rescanNonce ) ? preflight.rescanNonce : '' );
+		formData.append( 'action', 'prelaunch_checker_rescan' );
+		formData.append( 'nonce', ( prelaunchChecker && prelaunchChecker.rescanNonce ) ? prelaunchChecker.rescanNonce : '' );
 
-		fetch( ( preflight && preflight.ajaxUrl ) ? preflight.ajaxUrl : '/wp-admin/admin-ajax.php', {
+		fetch( ( prelaunchChecker && prelaunchChecker.ajaxUrl ) ? prelaunchChecker.ajaxUrl : '/wp-admin/admin-ajax.php', {
 			method:      'POST',
 			credentials: 'same-origin',
 			body:        formData,
@@ -97,21 +92,6 @@ document.addEventListener( 'DOMContentLoaded', function () {
 		.then( function ( data ) {
 			if ( data.success && data.data && data.data.html_partial ) {
 				dashboard.innerHTML = data.data.html_partial;
-
-				// Re-attach collapse behaviour to newly injected headers.
-				// (The rescan-btn delegation on dashboard survives automatically.)
-				var newHeaders = dashboard.querySelectorAll( '.preflight-category__header' );
-				for ( var j = 0; j < newHeaders.length; j++ ) {
-					( function ( h ) {
-						h.addEventListener( 'click', function () { toggleCategory( h ); } );
-						h.addEventListener( 'keydown', function ( ev ) {
-							if ( ev.key === 'Enter' || ev.key === ' ' ) {
-								ev.preventDefault();
-								toggleCategory( h );
-							}
-						} );
-					} )( newHeaders[ j ] );
-				}
 
 				if ( statusEl ) {
 					statusEl.textContent = 'Scan complete.';
@@ -124,17 +104,16 @@ document.addEventListener( 'DOMContentLoaded', function () {
 			showError( dashboard );
 		} )
 		.finally( function () {
-			// btn may be gone if the DOM was replaced; re-query by ID.
-			var newBtn = document.getElementById( 'preflight-rescan-btn' );
+			var newBtn = document.getElementById( 'prelaunch-checker-rescan-btn' );
 			if ( newBtn ) {
 				newBtn.disabled    = false;
-				newBtn.textContent = ( preflight && preflight.rescan ) ? preflight.rescan : 'Re-scan';
+				newBtn.textContent = ( prelaunchChecker && prelaunchChecker.rescan ) ? prelaunchChecker.rescan : 'Re-scan';
 			}
 		} );
 	} );
 
 	function showError( container ) {
-		var errorMsg = ( preflight && preflight.scanError ) ? preflight.scanError : 'Scan failed. Please try again.';
+		var errorMsg = ( prelaunchChecker && prelaunchChecker.scanError ) ? prelaunchChecker.scanError : 'Scan failed. Please try again.';
 		var notice   = document.createElement( 'div' );
 		notice.className = 'notice notice-error';
 		notice.innerHTML = '<p>' + errorMsg + '</p>';
@@ -154,7 +133,7 @@ document.addEventListener( 'DOMContentLoaded', function () {
 	// History table — keyboard navigation (row as link)
 	// -------------------------------------------------------------------------
 
-	var historyRows = document.querySelectorAll( '.preflight-history-row' );
+	var historyRows = document.querySelectorAll( '.prelaunch-checker-history-row' );
 	for ( var k = 0; k < historyRows.length; k++ ) {
 		( function ( row ) {
 			row.addEventListener( 'click', function () {

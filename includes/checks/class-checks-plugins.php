@@ -2,7 +2,7 @@
 /**
  * Plugin Hygiene check category — 3 checks per Brief §3.2.
  *
- * @package PreFlight
+ * @package Prelaunch_Checker
  * @since   0.8.0
  */
 
@@ -26,7 +26,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 0.8.0
  */
-class PreFlight_Checks_Plugins implements PreFlight_Check_Category {
+class Prelaunch_Checker_Checks_Plugins implements Prelaunch_Checker_Check_Category {
 
 	/**
 	 * Plugin label → detection signal for known development/debugging plugins.
@@ -50,7 +50,7 @@ class PreFlight_Checks_Plugins implements PreFlight_Check_Category {
 	 *   Developer      : Automattic_Developer (class) — no define(); version is a class constant
 	 *                    plugins.svn.wordpress.org/developer/trunk/developer.php
 	 *
-	 * Extension point (v1.1): a filter hook 'preflight_dev_plugin_signals' will
+	 * Extension point (v1.1): a filter hook 'prelaunch_checker_dev_plugin_signals' will
 	 * allow additions. Do not implement the filter now.
 	 *
 	 * @var array<string, string>
@@ -64,7 +64,7 @@ class PreFlight_Checks_Plugins implements PreFlight_Check_Category {
 	);
 
 	// -------------------------------------------------------------------------
-	// PreFlight_Check_Category interface
+	// Prelaunch_Checker_Check_Category interface
 	// -------------------------------------------------------------------------
 
 	/**
@@ -78,7 +78,7 @@ class PreFlight_Checks_Plugins implements PreFlight_Check_Category {
 	 * @return string
 	 */
 	public function get_category_label(): string {
-		return __( 'Plugin Hygiene', 'preflight-wp' );
+		return __( 'Plugin Hygiene', 'prelaunch-checker' );
 	}
 
 	/**
@@ -96,14 +96,14 @@ class PreFlight_Checks_Plugins implements PreFlight_Check_Category {
 	 * Return a check object for the given ID, or null if unknown.
 	 *
 	 * @param string $id Namespaced check ID.
-	 * @return PreFlight_Check|null
+	 * @return Prelaunch_Checker_Check|null
 	 */
-	public function get_check( string $id ): ?PreFlight_Check {
+	public function get_check( string $id ): ?Prelaunch_Checker_Check {
 		foreach ( self::get_spec() as $entry ) {
 			if ( $entry[0] !== $id ) {
 				continue;
 			}
-			return new PreFlight_Configurable_Check(
+			return new Prelaunch_Checker_Configurable_Check(
 				$entry[0],
 				$entry[1],
 				$entry[2],
@@ -127,9 +127,9 @@ class PreFlight_Checks_Plugins implements PreFlight_Check_Category {
 	 */
 	private static function get_spec(): array {
 		return array(
-			array( 'plugins.updates-available', __( 'Plugin updates available', 'preflight-wp' ), PREFLIGHT_SEVERITY_WARNING, 'check_plugin_updates' ),
-			array( 'plugins.dev-plugins-active', __( 'Development plugins active', 'preflight-wp' ), PREFLIGHT_SEVERITY_INFO,    'check_dev_plugins' ),
-			array( 'plugins.inactive-plugins',   __( 'Inactive plugins present',   'preflight-wp' ), PREFLIGHT_SEVERITY_INFO,    'check_inactive_plugins' ),
+			array( 'plugins.updates-available', __( 'Plugin updates available', 'prelaunch-checker' ), PRELAUNCH_CHECKER_SEVERITY_WARNING, 'check_plugin_updates' ),
+			array( 'plugins.dev-plugins-active', __( 'Development plugins active', 'prelaunch-checker' ), PRELAUNCH_CHECKER_SEVERITY_INFO,    'check_dev_plugins' ),
+			array( 'plugins.inactive-plugins',   __( 'Inactive plugins present',   'prelaunch-checker' ), PRELAUNCH_CHECKER_SEVERITY_INFO,    'check_inactive_plugins' ),
 		);
 	}
 
@@ -149,24 +149,24 @@ class PreFlight_Checks_Plugins implements PreFlight_Check_Category {
 	 * If the transient is absent, the check is skipped rather than failed.
 	 *
 	 * @since 0.8.0
-	 * @return PreFlight_Check_Result
+	 * @return Prelaunch_Checker_Check_Result
 	 */
-	public function check_plugin_updates(): PreFlight_Check_Result {
+	public function check_plugin_updates(): Prelaunch_Checker_Check_Result {
 		require_once ABSPATH . 'wp-admin/includes/plugin.php';
 		require_once ABSPATH . 'wp-admin/includes/update.php';
 
 		// get_plugin_updates() always returns an array; check the raw transient
 		// to distinguish "background check not run yet" from "no updates."
 		if ( false === get_site_transient( 'update_plugins' ) ) {
-			return PreFlight_Check_Result::skip(
-				__( 'Plugin update data is not available — the background update check has not run yet.', 'preflight-wp' )
+			return Prelaunch_Checker_Check_Result::skip(
+				__( 'Plugin update data is not available; the background update check has not run yet.', 'prelaunch-checker' )
 			);
 		}
 
 		$updates = get_plugin_updates();
 
 		if ( empty( $updates ) ) {
-			return PreFlight_Check_Result::pass();
+			return Prelaunch_Checker_Check_Result::pass();
 		}
 
 		$names = array();
@@ -176,14 +176,14 @@ class PreFlight_Checks_Plugins implements PreFlight_Check_Category {
 			}
 		}
 
-		return PreFlight_Check_Result::fail(
+		return Prelaunch_Checker_Check_Result::fail(
 			sprintf(
 				/* translators: 1: number of plugins with available updates, 2: comma-separated list of plugin names */
-				__( '%1$d plugin(s) have updates available: %2$s.', 'preflight-wp' ),
+				__( '%1$d plugin(s) have updates available: %2$s.', 'prelaunch-checker' ),
 				count( $updates ),
 				implode( ', ', $names )
 			),
-			__( 'Update plugins via Dashboard → Updates before launch. Test the site after updating — especially WooCommerce, page builders, and security plugins.', 'preflight-wp' )
+			__( 'Update plugins via Dashboard → Updates before launch. Test the site after updating; especially WooCommerce, page builders, and security plugins.', 'prelaunch-checker' )
 		);
 	}
 
@@ -195,9 +195,9 @@ class PreFlight_Checks_Plugins implements PreFlight_Check_Category {
 	 * as noted in Brief §3.2.
 	 *
 	 * @since 0.8.0
-	 * @return PreFlight_Check_Result
+	 * @return Prelaunch_Checker_Check_Result
 	 */
-	public function check_dev_plugins(): PreFlight_Check_Result {
+	public function check_dev_plugins(): Prelaunch_Checker_Check_Result {
 		$found = array();
 
 		foreach ( self::DEV_PLUGIN_SIGNALS as $label => $signal ) {
@@ -207,17 +207,17 @@ class PreFlight_Checks_Plugins implements PreFlight_Check_Category {
 		}
 
 		if ( ! empty( $found ) ) {
-			return PreFlight_Check_Result::fail(
+			return Prelaunch_Checker_Check_Result::fail(
 				sprintf(
 					/* translators: %s: comma-separated list of active development plugin names */
-					__( 'Development or debugging plugin(s) are active: %s.', 'preflight-wp' ),
+					__( 'Development or debugging plugin(s) are active: %s.', 'prelaunch-checker' ),
 					implode( ', ', $found )
 				),
-				__( 'Deactivate development plugins before launch. Query Monitor and Debug Bar may be left active by experienced developers who monitor production sites, but should be removed for client handoffs.', 'preflight-wp' )
+				__( 'Deactivate development plugins before launch. Query Monitor and Debug Bar may be left active by experienced developers who monitor production sites, but should be removed for client handoffs.', 'prelaunch-checker' )
 			);
 		}
 
-		return PreFlight_Check_Result::pass();
+		return Prelaunch_Checker_Check_Result::pass();
 	}
 
 	/**
@@ -230,9 +230,9 @@ class PreFlight_Checks_Plugins implements PreFlight_Check_Category {
 	 * get_plugins() requires wp-admin/includes/plugin.php.
 	 *
 	 * @since 0.8.0
-	 * @return PreFlight_Check_Result
+	 * @return Prelaunch_Checker_Check_Result
 	 */
-	public function check_inactive_plugins(): PreFlight_Check_Result {
+	public function check_inactive_plugins(): Prelaunch_Checker_Check_Result {
 		require_once ABSPATH . 'wp-admin/includes/plugin.php';
 
 		$all_plugins    = get_plugins();
@@ -241,27 +241,27 @@ class PreFlight_Checks_Plugins implements PreFlight_Check_Category {
 		$inactive = array_diff_key( $all_plugins, array_flip( $active_plugins ) );
 
 		if ( empty( $inactive ) ) {
-			return PreFlight_Check_Result::pass();
+			return Prelaunch_Checker_Check_Result::pass();
 		}
 
 		$names = array_column( array_values( $inactive ), 'Name' );
 		sort( $names );
 
-		return PreFlight_Check_Result::fail(
+		return Prelaunch_Checker_Check_Result::fail(
 			sprintf(
 				/* translators: 1: count, 2: comma-separated plugin names */
-				__( '%1$d inactive plugin(s) are installed: %2$s.', 'preflight-wp' ),
+				__( '%1$d inactive plugin(s) are installed: %2$s.', 'prelaunch-checker' ),
 				count( $inactive ),
 				implode( ', ', $names )
 			),
-			__( 'Delete plugins that are not in use. Inactive plugins still represent attack surface if they contain vulnerabilities, and they slow down plugin update scanning.', 'preflight-wp' )
+			__( 'Delete plugins that are not in use. Inactive plugins still represent attack surface if they contain vulnerabilities, and they slow down plugin update scanning.', 'prelaunch-checker' )
 		);
 	}
 }
 
 add_action(
-	'preflight_register_categories',
-	static function ( PreFlight_Core $core ): void {
-		$core->register_category( new PreFlight_Checks_Plugins() );
+	'prelaunch_checker_register_categories',
+	static function ( Prelaunch_Checker_Core $core ): void {
+		$core->register_category( new Prelaunch_Checker_Checks_Plugins() );
 	}
 );
