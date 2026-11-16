@@ -10,28 +10,29 @@
  *   $rescan_nonce    (string)     — nonce value for the scan trigger form.
  *   $is_historical   (bool)       — true when displaying a historical scan (not latest).
  *
- * @package PreFlight
+ * @package Prelaunch_Checker
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- template-scoped variables injected by render_dashboard_partial().
 $is_historical = isset( $is_historical ) ? (bool) $is_historical : false;
 ?>
-<div id="preflight-dashboard">
+<div id="prelaunch-checker-dashboard">
 
 <?php if ( null === $envelope ) : ?>
 
 	<?php /* Empty state — no scan has been run yet. */ ?>
-	<div class="preflight-empty-state">
-		<p class="preflight-empty-state__lead">
-			<?php esc_html_e( 'No scan results yet. Click "Run Scan" to check this site for pre-launch issues.', 'preflight-wp' ); ?>
+	<div class="prelaunch-checker-empty-state">
+		<p class="prelaunch-checker-empty-state__lead">
+			<?php esc_html_e( 'No scan results yet. Click "Run Scan" to check this site for pre-launch issues.', 'prelaunch-checker' ); ?>
 		</p>
 		<form method="post" action="<?php echo esc_url( $scan_action_url ); ?>">
-			<?php wp_nonce_field( 'preflight_run_scan', 'preflight_scan_nonce' ); ?>
+			<?php wp_nonce_field( 'prelaunch_checker_run_scan', 'prelaunch_checker_scan_nonce' ); ?>
 			<button type="submit" class="button button-primary button-hero">
-				<?php esc_html_e( 'Run Scan', 'preflight-wp' ); ?>
+				<?php esc_html_e( 'Run Scan', 'prelaunch-checker' ); ?>
 			</button>
 		</form>
 	</div>
@@ -45,53 +46,53 @@ $is_historical = isset( $is_historical ) ? (bool) $is_historical : false;
 	?>
 
 	<?php /* Summary bar */ ?>
-	<div class="preflight-summary" role="region" aria-label="<?php esc_attr_e( 'Scan summary', 'preflight-wp' ); ?>">
-		<div class="preflight-summary__meta">
+	<div class="prelaunch-checker-summary" role="region" aria-label="<?php esc_attr_e( 'Scan summary', 'prelaunch-checker' ); ?>">
+		<div class="prelaunch-checker-summary__meta">
 			<?php
 			echo esc_html(
 				sprintf(
 					/* translators: %s: scan timestamp */
-					__( 'Last scanned: %s', 'preflight-wp' ),
+					__( 'Last scanned: %s', 'prelaunch-checker' ),
 					wp_date( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), strtotime( $timestamp ) )
 				)
 			);
 			?>
 		</div>
-		<ul class="preflight-summary__counts" aria-label="<?php esc_attr_e( 'Issue counts by severity', 'preflight-wp' ); ?>">
-			<li class="preflight-summary__count preflight-summary__count--blocker">
-				<span class="preflight-severity-pill preflight-severity-pill--blocker" aria-hidden="true"><?php esc_html_e( 'BLOCKER', 'preflight-wp' ); ?></span>
-				<span class="preflight-count-value"><?php echo absint( $summary['blockers'] ); ?></span>
+		<ul class="prelaunch-checker-summary__counts" aria-label="<?php esc_attr_e( 'Issue counts by severity', 'prelaunch-checker' ); ?>">
+			<li class="prelaunch-checker-summary__count prelaunch-checker-summary__count--blocker">
+				<span class="prelaunch-checker-severity-pill prelaunch-checker-severity-pill--blocker" aria-hidden="true"><?php esc_html_e( 'BLOCKER', 'prelaunch-checker' ); ?></span>
+				<span class="prelaunch-checker-count-value"><?php echo absint( $summary['blockers'] ); ?></span>
 			</li>
-			<li class="preflight-summary__count preflight-summary__count--warning">
-				<span class="preflight-severity-pill preflight-severity-pill--warning" aria-hidden="true"><?php esc_html_e( 'WARNING', 'preflight-wp' ); ?></span>
-				<span class="preflight-count-value"><?php echo absint( $summary['warnings'] ); ?></span>
+			<li class="prelaunch-checker-summary__count prelaunch-checker-summary__count--warning">
+				<span class="prelaunch-checker-severity-pill prelaunch-checker-severity-pill--warning" aria-hidden="true"><?php esc_html_e( 'WARNING', 'prelaunch-checker' ); ?></span>
+				<span class="prelaunch-checker-count-value"><?php echo absint( $summary['warnings'] ); ?></span>
 			</li>
-			<li class="preflight-summary__count preflight-summary__count--info">
-				<span class="preflight-severity-pill preflight-severity-pill--info" aria-hidden="true"><?php esc_html_e( 'INFO', 'preflight-wp' ); ?></span>
-				<span class="preflight-count-value"><?php echo absint( $summary['info'] ); ?></span>
+			<li class="prelaunch-checker-summary__count prelaunch-checker-summary__count--info">
+				<span class="prelaunch-checker-severity-pill prelaunch-checker-severity-pill--info" aria-hidden="true"><?php esc_html_e( 'INFO', 'prelaunch-checker' ); ?></span>
+				<span class="prelaunch-checker-count-value"><?php echo absint( $summary['info'] ); ?></span>
 			</li>
-			<li class="preflight-summary__count preflight-summary__count--pass">
-				<span class="preflight-severity-pill preflight-severity-pill--pass" aria-hidden="true"><?php esc_html_e( 'PASS', 'preflight-wp' ); ?></span>
-				<span class="preflight-count-value"><?php echo absint( $summary['passed'] ); ?></span>
+			<li class="prelaunch-checker-summary__count prelaunch-checker-summary__count--pass">
+				<span class="prelaunch-checker-severity-pill prelaunch-checker-severity-pill--pass" aria-hidden="true"><?php esc_html_e( 'PASS', 'prelaunch-checker' ); ?></span>
+				<span class="prelaunch-checker-count-value"><?php echo absint( $summary['passed'] ); ?></span>
 			</li>
 		</ul>
 	</div>
 
 	<?php /* Historical scan banner */ ?>
 	<?php if ( $is_historical ) : ?>
-		<div class="notice notice-info preflight-historical-notice">
+		<div class="notice notice-info prelaunch-checker-historical-notice">
 			<p>
 				<?php
 				echo esc_html(
 					sprintf(
 						/* translators: %s: scan timestamp */
-						__( 'Viewing historical scan from %s.', 'preflight-wp' ),
+						__( 'Viewing historical scan from %s.', 'prelaunch-checker' ),
 						wp_date( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), strtotime( $timestamp ) )
 					)
 				);
 				?>
-				<a href="<?php echo esc_url( admin_url( 'tools.php?page=preflight&tab=dashboard' ) ); ?>">
-					<?php esc_html_e( 'View latest scan', 'preflight-wp' ); ?>
+				<a href="<?php echo esc_url( admin_url( 'tools.php?page=prelaunch-checker&tab=dashboard' ) ); ?>">
+					<?php esc_html_e( 'View latest scan', 'prelaunch-checker' ); ?>
 				</a>
 			</p>
 		</div>
@@ -103,14 +104,14 @@ $is_historical = isset( $is_historical ) ? (bool) $is_historical : false;
 		$new_count      = count( $delta['new'] );
 		$resolved_count = count( $delta['resolved'] );
 		?>
-		<div class="preflight-delta" role="region" aria-label="<?php esc_attr_e( 'Changes since last scan', 'preflight-wp' ); ?>">
+		<div class="prelaunch-checker-delta" role="region" aria-label="<?php esc_attr_e( 'Changes since last scan', 'prelaunch-checker' ); ?>">
 			<?php if ( $new_count > 0 ) : ?>
-				<span class="preflight-delta__new">
+				<span class="prelaunch-checker-delta__new">
 					<?php
 					echo esc_html(
 						sprintf(
 							/* translators: %d: number of new issues */
-							_n( '%d new issue', '%d new issues', $new_count, 'preflight-wp' ),
+							_n( '%d new issue', '%d new issues', $new_count, 'prelaunch-checker' ),
 							$new_count
 						)
 					);
@@ -118,12 +119,12 @@ $is_historical = isset( $is_historical ) ? (bool) $is_historical : false;
 				</span>
 			<?php endif; ?>
 			<?php if ( $resolved_count > 0 ) : ?>
-				<span class="preflight-delta__resolved">
+				<span class="prelaunch-checker-delta__resolved">
 					<?php
 					echo esc_html(
 						sprintf(
 							/* translators: %d: number of resolved issues */
-							_n( '%d resolved', '%d resolved', $resolved_count, 'preflight-wp' ),
+							_n( '%d resolved', '%d resolved', $resolved_count, 'prelaunch-checker' ),
 							$resolved_count
 						)
 					);
@@ -131,18 +132,18 @@ $is_historical = isset( $is_historical ) ? (bool) $is_historical : false;
 				</span>
 			<?php endif; ?>
 			<?php if ( 0 === $new_count && 0 === $resolved_count ) : ?>
-				<span class="preflight-delta__unchanged"><?php esc_html_e( 'No changes since last scan.', 'preflight-wp' ); ?></span>
+				<span class="prelaunch-checker-delta__unchanged"><?php esc_html_e( 'No changes since last scan.', 'prelaunch-checker' ); ?></span>
 			<?php endif; ?>
 		</div>
 	<?php endif; ?>
 
 	<?php /* Re-scan button — hidden when browsing a historical scan */ ?>
 	<?php if ( ! $is_historical ) : ?>
-	<div class="preflight-actions">
-		<form method="post" action="<?php echo esc_url( $scan_action_url ); ?>" id="preflight-rescan-form">
-			<?php wp_nonce_field( 'preflight_run_scan', 'preflight_scan_nonce' ); ?>
-			<button type="submit" id="preflight-rescan-btn" class="button button-primary">
-				<?php esc_html_e( 'Re-scan', 'preflight-wp' ); ?>
+	<div class="prelaunch-checker-actions">
+		<form method="post" action="<?php echo esc_url( $scan_action_url ); ?>" id="prelaunch-checker-rescan-form">
+			<?php wp_nonce_field( 'prelaunch_checker_run_scan', 'prelaunch_checker_scan_nonce' ); ?>
+			<button type="submit" id="prelaunch-checker-rescan-btn" class="button button-primary">
+				<?php esc_html_e( 'Re-scan', 'prelaunch-checker' ); ?>
 			</button>
 		</form>
 	</div>
@@ -164,16 +165,16 @@ $is_historical = isset( $is_historical ) ? (bool) $is_historical : false;
 
 	// Severity sort order.
 	$severity_order = array(
-		PREFLIGHT_SEVERITY_BLOCKER => 0,
-		PREFLIGHT_SEVERITY_WARNING => 1,
-		PREFLIGHT_SEVERITY_INFO    => 2,
+		PRELAUNCH_CHECKER_SEVERITY_BLOCKER => 0,
+		PRELAUNCH_CHECKER_SEVERITY_WARNING => 1,
+		PRELAUNCH_CHECKER_SEVERITY_INFO    => 2,
 	);
 
 	foreach ( $by_category as $cat_id => $cat_results ) :
 		// Count failures in this category.
 		$fail_count = 0;
 		foreach ( $cat_results as $row ) {
-			if ( PREFLIGHT_STATUS_FAIL === $row['status'] ) {
+			if ( PRELAUNCH_CHECKER_STATUS_FAIL === $row['status'] ) {
 				$fail_count++;
 			}
 		}
@@ -186,74 +187,74 @@ $is_historical = isset( $is_historical ) ? (bool) $is_historical : false;
 				return $ord_a - $ord_b;
 			}
 			// Fail before pass/skip within same severity.
-			$status_order = array( PREFLIGHT_STATUS_FAIL => 0, PREFLIGHT_STATUS_PASS => 1, PREFLIGHT_STATUS_SKIP => 2 );
+			$status_order = array( PRELAUNCH_CHECKER_STATUS_FAIL => 0, PRELAUNCH_CHECKER_STATUS_PASS => 1, PRELAUNCH_CHECKER_STATUS_SKIP => 2 );
 			return ( $status_order[ $a['status'] ] ?? 9 ) - ( $status_order[ $b['status'] ] ?? 9 );
 		} );
 
-		$section_id = 'preflight-cat-' . esc_attr( $cat_id );
+		$section_id = 'prelaunch-checker-cat-' . esc_attr( $cat_id );
 		$label      = isset( $category_labels[ $cat_id ] ) ? $category_labels[ $cat_id ] : $cat_id;
 	?>
-		<section class="preflight-category is-expanded" id="<?php echo esc_attr( $section_id . '-section' ); ?>">
-			<h2 class="preflight-category__header">
+		<section class="prelaunch-checker-category is-expanded" id="<?php echo esc_attr( $section_id . '-section' ); ?>">
+			<h2 class="prelaunch-checker-category__header">
 				<button
 					type="button"
-					class="preflight-category__toggle"
+					class="prelaunch-checker-category__toggle"
 					id="<?php echo esc_attr( $section_id . '-header' ); ?>"
 					aria-expanded="true"
 					aria-controls="<?php echo esc_attr( $section_id . '-body' ); ?>"
 				>
-					<span class="preflight-category__chevron" aria-hidden="true"></span>
-					<span class="preflight-category__label"><?php echo esc_html( $label ); ?></span>
+					<span class="prelaunch-checker-category__chevron" aria-hidden="true"></span>
+					<span class="prelaunch-checker-category__label"><?php echo esc_html( $label ); ?></span>
 					<?php if ( $fail_count > 0 ) : ?>
-						<span class="preflight-category__badge" aria-label="<?php
+						<span class="prelaunch-checker-category__badge" aria-label="<?php
 						/* translators: %d: number of failing checks in this category */
-						echo esc_attr( sprintf( _n( '%d issue', '%d issues', $fail_count, 'preflight-wp' ), $fail_count ) ); ?>">
+						echo esc_attr( sprintf( _n( '%d issue', '%d issues', $fail_count, 'prelaunch-checker' ), $fail_count ) ); ?>">
 							<?php echo absint( $fail_count ); ?>
 						</span>
 					<?php endif; ?>
 				</button>
 			</h2>
 			<div
-				class="preflight-category__body"
+				class="prelaunch-checker-category__body"
 				id="<?php echo esc_attr( $section_id . '-body' ); ?>"
 				role="region"
 				aria-labelledby="<?php echo esc_attr( $section_id . '-header' ); ?>"
 			>
-				<table class="wp-list-table widefat fixed striped preflight-results-table">
+				<table class="wp-list-table widefat fixed striped prelaunch-checker-results-table">
 					<thead>
 						<tr>
-							<th scope="col" class="preflight-col-severity"><?php esc_html_e( 'Severity', 'preflight-wp' ); ?></th>
-							<th scope="col" class="preflight-col-check"><?php esc_html_e( 'Check', 'preflight-wp' ); ?></th>
-							<th scope="col" class="preflight-col-result"><?php esc_html_e( 'Result', 'preflight-wp' ); ?></th>
+							<th scope="col" class="prelaunch-checker-col-severity"><?php esc_html_e( 'Severity', 'prelaunch-checker' ); ?></th>
+							<th scope="col" class="prelaunch-checker-col-check"><?php esc_html_e( 'Check', 'prelaunch-checker' ); ?></th>
+							<th scope="col" class="prelaunch-checker-col-result"><?php esc_html_e( 'Result', 'prelaunch-checker' ); ?></th>
 						</tr>
 					</thead>
 					<tbody>
 					<?php foreach ( $cat_results as $row ) : ?>
-						<tr class="preflight-result preflight-result--<?php echo esc_attr( $row['status'] ); ?>">
-							<td class="preflight-col-severity">
-								<?php if ( PREFLIGHT_STATUS_FAIL === $row['status'] ) : ?>
-									<span class="preflight-severity-pill preflight-severity-pill--<?php echo esc_attr( $row['severity'] ); ?>">
+						<tr class="prelaunch-checker-result prelaunch-checker-result--<?php echo esc_attr( $row['status'] ); ?>">
+							<td class="prelaunch-checker-col-severity">
+								<?php if ( PRELAUNCH_CHECKER_STATUS_FAIL === $row['status'] ) : ?>
+									<span class="prelaunch-checker-severity-pill prelaunch-checker-severity-pill--<?php echo esc_attr( $row['severity'] ); ?>">
 										<?php echo esc_html( strtoupper( $row['severity'] ) ); ?>
 									</span>
-								<?php elseif ( PREFLIGHT_STATUS_PASS === $row['status'] ) : ?>
-									<span class="preflight-severity-pill preflight-severity-pill--pass"><?php esc_html_e( 'PASS', 'preflight-wp' ); ?></span>
+								<?php elseif ( PRELAUNCH_CHECKER_STATUS_PASS === $row['status'] ) : ?>
+									<span class="prelaunch-checker-severity-pill prelaunch-checker-severity-pill--pass"><?php esc_html_e( 'PASS', 'prelaunch-checker' ); ?></span>
 								<?php else : ?>
-									<span class="preflight-severity-pill preflight-severity-pill--skip"><?php esc_html_e( 'SKIP', 'preflight-wp' ); ?></span>
+									<span class="prelaunch-checker-severity-pill prelaunch-checker-severity-pill--skip"><?php esc_html_e( 'SKIP', 'prelaunch-checker' ); ?></span>
 								<?php endif; ?>
 							</td>
-							<td class="preflight-col-check">
+							<td class="prelaunch-checker-col-check">
 								<?php echo esc_html( $row['label'] ); ?>
 							</td>
-							<td class="preflight-col-result">
-								<?php if ( PREFLIGHT_STATUS_FAIL === $row['status'] ) : ?>
+							<td class="prelaunch-checker-col-result">
+								<?php if ( PRELAUNCH_CHECKER_STATUS_FAIL === $row['status'] ) : ?>
 									<strong><?php echo esc_html( $row['message'] ); ?></strong>
 									<?php if ( ! empty( $row['fix_hint'] ) ) : ?>
-										<p class="preflight-fix-hint"><?php echo esc_html( $row['fix_hint'] ); ?></p>
+										<p class="prelaunch-checker-fix-hint"><?php echo esc_html( $row['fix_hint'] ); ?></p>
 									<?php endif; ?>
-								<?php elseif ( PREFLIGHT_STATUS_SKIP === $row['status'] ) : ?>
-									<span class="preflight-skip-message"><?php echo esc_html( $row['message'] ); ?></span>
+								<?php elseif ( PRELAUNCH_CHECKER_STATUS_SKIP === $row['status'] ) : ?>
+									<span class="prelaunch-checker-skip-message"><?php echo esc_html( $row['message'] ); ?></span>
 								<?php else : ?>
-									<span class="preflight-pass-message"><?php esc_html_e( 'Passed', 'preflight-wp' ); ?></span>
+									<span class="prelaunch-checker-pass-message"><?php esc_html_e( 'Passed', 'prelaunch-checker' ); ?></span>
 								<?php endif; ?>
 							</td>
 						</tr>

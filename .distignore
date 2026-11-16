@@ -1,0 +1,10 @@
+.git
+.gitignore
+.distignore
+.claude
+.wordpress-org
+.DS_Store
+scripts
+CLAUDE.md
+BRIEF.md
+README.md

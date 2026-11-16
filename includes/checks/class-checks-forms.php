@@ -2,7 +2,7 @@
 /**
  * Forms & Communication check category — 2 checks per Brief §3.2.
  *
- * @package PreFlight
+ * @package Prelaunch_Checker
  * @since   0.6.0
  */
 
@@ -23,7 +23,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 0.6.0
  */
-class PreFlight_Checks_Forms implements PreFlight_Check_Category {
+class Prelaunch_Checker_Checks_Forms implements Prelaunch_Checker_Check_Category {
 
 	/**
 	 * Plugin label → detection signal map for recognised contact form plugins.
@@ -48,7 +48,7 @@ class PreFlight_Checks_Forms implements PreFlight_Check_Category {
 	 *                      verified via unofficial GitHub mirror (yangm97/elementor-pro v3.6.4);
 	 *                      no official public source — constant name is stable across versions
 	 *
-	 * Extension point (v1.1): a filter hook 'preflight_contact_form_signals' will
+	 * Extension point (v1.1): a filter hook 'prelaunch_checker_contact_form_signals' will
 	 * allow site-specific additions. Do not implement the filter now.
 	 *
 	 * @var array<string, string>
@@ -82,7 +82,7 @@ class PreFlight_Checks_Forms implements PreFlight_Check_Category {
 	 *   SMTP Mailer   : SMTP_MAILER_VERSION — define() in main.php
 	 *                   plugins.svn.wordpress.org/smtp-mailer/trunk/main.php
 	 *
-	 * Extension point (v1.1): a filter hook 'preflight_smtp_plugin_signals' will
+	 * Extension point (v1.1): a filter hook 'prelaunch_checker_smtp_plugin_signals' will
 	 * allow additions. Do not implement the filter now.
 	 *
 	 * @var array<string, string>
@@ -96,7 +96,7 @@ class PreFlight_Checks_Forms implements PreFlight_Check_Category {
 	);
 
 	// -------------------------------------------------------------------------
-	// PreFlight_Check_Category interface
+	// Prelaunch_Checker_Check_Category interface
 	// -------------------------------------------------------------------------
 
 	/**
@@ -110,7 +110,7 @@ class PreFlight_Checks_Forms implements PreFlight_Check_Category {
 	 * @return string
 	 */
 	public function get_category_label(): string {
-		return __( 'Forms & Communication', 'preflight-wp' );
+		return __( 'Forms & Communication', 'prelaunch-checker' );
 	}
 
 	/**
@@ -128,14 +128,14 @@ class PreFlight_Checks_Forms implements PreFlight_Check_Category {
 	 * Return a check object for the given ID, or null if unknown.
 	 *
 	 * @param string $id Namespaced check ID.
-	 * @return PreFlight_Check|null
+	 * @return Prelaunch_Checker_Check|null
 	 */
-	public function get_check( string $id ): ?PreFlight_Check {
+	public function get_check( string $id ): ?Prelaunch_Checker_Check {
 		foreach ( self::get_spec() as $entry ) {
 			if ( $entry[0] !== $id ) {
 				continue;
 			}
-			return new PreFlight_Configurable_Check(
+			return new Prelaunch_Checker_Configurable_Check(
 				$entry[0],
 				$entry[1],
 				$entry[2],
@@ -159,8 +159,8 @@ class PreFlight_Checks_Forms implements PreFlight_Check_Category {
 	 */
 	private static function get_spec(): array {
 		return array(
-			array( 'forms.no-smtp-configured', __( 'Transactional email delivery', 'preflight-wp' ), PREFLIGHT_SEVERITY_WARNING, 'check_smtp_plugin' ),
-			array( 'forms.no-contact-form',    __( 'Contact form plugin',          'preflight-wp' ), PREFLIGHT_SEVERITY_INFO,    'check_contact_form' ),
+			array( 'forms.no-smtp-configured', __( 'Transactional email delivery', 'prelaunch-checker' ), PRELAUNCH_CHECKER_SEVERITY_WARNING, 'check_smtp_plugin' ),
+			array( 'forms.no-contact-form',    __( 'Contact form plugin',          'prelaunch-checker' ), PRELAUNCH_CHECKER_SEVERITY_INFO,    'check_contact_form' ),
 		);
 	}
 
@@ -176,16 +176,16 @@ class PreFlight_Checks_Forms implements PreFlight_Check_Category {
 	 * is out of scope for the MVP scan (Brief §5.2).
 	 *
 	 * @since 0.6.0
-	 * @return PreFlight_Check_Result
+	 * @return Prelaunch_Checker_Check_Result
 	 */
-	public function check_smtp_plugin(): PreFlight_Check_Result {
+	public function check_smtp_plugin(): Prelaunch_Checker_Check_Result {
 		if ( null !== $this->matches_any_signal( self::SMTP_PLUGIN_SIGNALS ) ) {
-			return PreFlight_Check_Result::pass();
+			return Prelaunch_Checker_Check_Result::pass();
 		}
 
-		return PreFlight_Check_Result::fail(
-			__( 'No transactional email plugin is active. WordPress will fall back to PHP\'s mail() function, which is unreliable on most managed hosts — password resets, order notifications, and contact form submissions may silently fail to deliver.', 'preflight-wp' ),
-			__( 'Install and configure WP Mail SMTP, FluentSMTP, Post SMTP, or Easy WP SMTP. Connect it to a transactional email service (SendGrid, Postmark, Amazon SES, Mailgun, or the host\'s built-in mailer). After launch, verify delivery by sending a test email and triggering a password reset.', 'preflight-wp' )
+		return Prelaunch_Checker_Check_Result::fail(
+			__( 'No transactional email plugin is active. WordPress will fall back to PHP\'s mail() function, which is unreliable on most managed hosts; password resets, order notifications, and contact form submissions may silently fail to deliver.', 'prelaunch-checker' ),
+			__( 'Install and configure WP Mail SMTP, FluentSMTP, Post SMTP, or Easy WP SMTP. Connect it to a transactional email service (SendGrid, Postmark, Amazon SES, Mailgun, or the host\'s built-in mailer). After launch, verify delivery by sending a test email and triggering a password reset.', 'prelaunch-checker' )
 		);
 	}
 
@@ -196,16 +196,16 @@ class PreFlight_Checks_Forms implements PreFlight_Check_Category {
 	 * reflects that not every site needs a contact form.
 	 *
 	 * @since 0.6.0
-	 * @return PreFlight_Check_Result
+	 * @return Prelaunch_Checker_Check_Result
 	 */
-	public function check_contact_form(): PreFlight_Check_Result {
+	public function check_contact_form(): Prelaunch_Checker_Check_Result {
 		if ( null !== $this->matches_any_signal( self::CONTACT_FORM_SIGNALS ) ) {
-			return PreFlight_Check_Result::pass();
+			return Prelaunch_Checker_Check_Result::pass();
 		}
 
-		return PreFlight_Check_Result::fail(
-			__( 'No recognized contact form plugin is active.', 'preflight-wp' ),
-			__( 'If the site needs a contact form, install one of: Contact Form 7, Gravity Forms, WPForms, Ninja Forms, Fluent Forms, Formidable Forms. If the site uses a custom form or no form at all, suppress this check.', 'preflight-wp' )
+		return Prelaunch_Checker_Check_Result::fail(
+			__( 'No recognized contact form plugin is active.', 'prelaunch-checker' ),
+			__( 'If the site needs a contact form, install one of: Contact Form 7, Gravity Forms, WPForms, Ninja Forms, Fluent Forms, Formidable Forms. If the site uses a custom form or no form at all, suppress this check.', 'prelaunch-checker' )
 		);
 	}
 
@@ -216,7 +216,7 @@ class PreFlight_Checks_Forms implements PreFlight_Check_Category {
 	/**
 	 * Return the first matched plugin label for the given signal map, or null.
 	 *
-	 * Intentionally duplicated from PreFlight_Checks_SEO — no shared extraction
+	 * Intentionally duplicated from Prelaunch_Checker_Checks_SEO — no shared extraction
 	 * until a third category needs it (YAGNI).
 	 *
 	 * @param array<string, string> $signals Plugin label => detection signal.
@@ -233,8 +233,8 @@ class PreFlight_Checks_Forms implements PreFlight_Check_Category {
 }
 
 add_action(
-	'preflight_register_categories',
-	static function ( PreFlight_Core $core ): void {
-		$core->register_category( new PreFlight_Checks_Forms() );
+	'prelaunch_checker_register_categories',
+	static function ( Prelaunch_Checker_Core $core ): void {
+		$core->register_category( new Prelaunch_Checker_Checks_Forms() );
 	}
 );

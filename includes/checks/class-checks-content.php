@@ -2,7 +2,7 @@
 /**
  * Content & Appearance check category — 5 checks per Brief §3.3.
  *
- * @package PreFlight
+ * @package Prelaunch_Checker
  * @since   0.3.0
  */
 
@@ -19,10 +19,10 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 0.3.0
  */
-class PreFlight_Checks_Content implements PreFlight_Check_Category {
+class Prelaunch_Checker_Checks_Content implements Prelaunch_Checker_Check_Category {
 
 	// -------------------------------------------------------------------------
-	// PreFlight_Check_Category interface
+	// Prelaunch_Checker_Check_Category interface
 	// -------------------------------------------------------------------------
 
 	public function get_category_id(): string {
@@ -30,7 +30,7 @@ class PreFlight_Checks_Content implements PreFlight_Check_Category {
 	}
 
 	public function get_category_label(): string {
-		return __( 'Content & Appearance', 'preflight-wp' );
+		return __( 'Content & Appearance', 'prelaunch-checker' );
 	}
 
 	/**
@@ -49,14 +49,14 @@ class PreFlight_Checks_Content implements PreFlight_Check_Category {
 	 * Return a check object for the given ID, or null if the ID is unknown.
 	 *
 	 * @param string $id Namespaced check ID.
-	 * @return PreFlight_Check|null
+	 * @return Prelaunch_Checker_Check|null
 	 */
-	public function get_check( string $id ): ?PreFlight_Check {
+	public function get_check( string $id ): ?Prelaunch_Checker_Check {
 		foreach ( self::get_spec() as $entry ) {
 			if ( $entry[0] !== $id ) {
 				continue;
 			}
-			return new PreFlight_Configurable_Check(
+			return new Prelaunch_Checker_Configurable_Check(
 				$entry[0],
 				$entry[1],
 				$entry[2],
@@ -80,11 +80,11 @@ class PreFlight_Checks_Content implements PreFlight_Check_Category {
 	 */
 	private static function get_spec(): array {
 		return array(
-			array( 'content.favicon-missing',        __( 'Favicon not set',                   'preflight-wp' ), PREFLIGHT_SEVERITY_BLOCKER, 'check_favicon_missing' ),
-			array( 'content.site-title-missing',     __( 'Site title is blank',               'preflight-wp' ), PREFLIGHT_SEVERITY_BLOCKER, 'check_site_title_missing' ),
-			array( 'content.no-404-template',        __( 'No 404 template found',             'preflight-wp' ), PREFLIGHT_SEVERITY_WARNING, 'check_no_404_template' ),
-			array( 'content.no-published-content',   __( 'Site has no published content',     'preflight-wp' ), PREFLIGHT_SEVERITY_WARNING, 'check_no_published_content' ),
-			array( 'content.sample-content-present', __( 'Default sample content still live', 'preflight-wp' ), PREFLIGHT_SEVERITY_WARNING, 'check_sample_content_present' ),
+			array( 'content.favicon-missing',        __( 'Favicon not set',                   'prelaunch-checker' ), PRELAUNCH_CHECKER_SEVERITY_BLOCKER, 'check_favicon_missing' ),
+			array( 'content.site-title-missing',     __( 'Site title is blank',               'prelaunch-checker' ), PRELAUNCH_CHECKER_SEVERITY_BLOCKER, 'check_site_title_missing' ),
+			array( 'content.no-404-template',        __( 'No 404 template found',             'prelaunch-checker' ), PRELAUNCH_CHECKER_SEVERITY_WARNING, 'check_no_404_template' ),
+			array( 'content.no-published-content',   __( 'Site has no published content',     'prelaunch-checker' ), PRELAUNCH_CHECKER_SEVERITY_WARNING, 'check_no_published_content' ),
+			array( 'content.sample-content-present', __( 'Default sample content still live', 'prelaunch-checker' ), PRELAUNCH_CHECKER_SEVERITY_WARNING, 'check_sample_content_present' ),
 		);
 	}
 
@@ -99,32 +99,32 @@ class PreFlight_Checks_Content implements PreFlight_Check_Category {
 	 * (WordPress 4.3+, safe at the WP 6.0 baseline).
 	 *
 	 * @since 0.3.0
-	 * @return PreFlight_Check_Result
+	 * @return Prelaunch_Checker_Check_Result
 	 */
-	public function check_favicon_missing(): PreFlight_Check_Result {
+	public function check_favicon_missing(): Prelaunch_Checker_Check_Result {
 		if ( '' === get_site_icon_url() ) {
-			return PreFlight_Check_Result::fail(
-				__( 'No site icon has been configured.', 'preflight-wp' ),
-				__( 'Go to Appearance → Customize → Site Identity and upload a Site Icon (at least 512 × 512 px).', 'preflight-wp' )
+			return Prelaunch_Checker_Check_Result::fail(
+				__( 'No site icon has been configured.', 'prelaunch-checker' ),
+				__( 'Go to Appearance → Customize → Site Identity and upload a Site Icon (at least 512 × 512 px).', 'prelaunch-checker' )
 			);
 		}
-		return PreFlight_Check_Result::pass();
+		return Prelaunch_Checker_Check_Result::pass();
 	}
 
 	/**
 	 * Fail when the site title (blogname option) is empty or whitespace-only.
 	 *
 	 * @since 0.3.0
-	 * @return PreFlight_Check_Result
+	 * @return Prelaunch_Checker_Check_Result
 	 */
-	public function check_site_title_missing(): PreFlight_Check_Result {
+	public function check_site_title_missing(): Prelaunch_Checker_Check_Result {
 		if ( '' === trim( get_bloginfo( 'name' ) ) ) {
-			return PreFlight_Check_Result::fail(
-				__( 'The site title is blank.', 'preflight-wp' ),
-				__( 'Go to Settings → General and enter a Site Title.', 'preflight-wp' )
+			return Prelaunch_Checker_Check_Result::fail(
+				__( 'The site title is blank.', 'prelaunch-checker' ),
+				__( 'Go to Settings → General and enter a Site Title.', 'prelaunch-checker' )
 			);
 		}
-		return PreFlight_Check_Result::pass();
+		return Prelaunch_Checker_Check_Result::pass();
 	}
 
 	/**
@@ -137,9 +137,9 @@ class PreFlight_Checks_Content implements PreFlight_Check_Category {
 	 * wp_is_block_theme() is available since WP 5.9; safe at WP 6.0 baseline.
 	 *
 	 * @since 0.3.0
-	 * @return PreFlight_Check_Result
+	 * @return Prelaunch_Checker_Check_Result
 	 */
-	public function check_no_404_template(): PreFlight_Check_Result {
+	public function check_no_404_template(): Prelaunch_Checker_Check_Result {
 		if ( wp_is_block_theme() ) {
 			$found = file_exists( get_stylesheet_directory() . '/templates/404.html' )
 				|| file_exists( get_template_directory() . '/templates/404.html' );
@@ -148,12 +148,12 @@ class PreFlight_Checks_Content implements PreFlight_Check_Category {
 		}
 
 		if ( ! $found ) {
-			return PreFlight_Check_Result::fail(
-				__( 'The active theme does not include a 404 template.', 'preflight-wp' ),
-				__( 'Add a 404.php (classic themes) or templates/404.html (block themes) to your theme, or install a theme that includes one.', 'preflight-wp' )
+			return Prelaunch_Checker_Check_Result::fail(
+				__( 'The active theme does not include a 404 template.', 'prelaunch-checker' ),
+				__( 'Add a 404.php (classic themes) or templates/404.html (block themes) to your theme, or install a theme that includes one.', 'prelaunch-checker' )
 			);
 		}
-		return PreFlight_Check_Result::pass();
+		return Prelaunch_Checker_Check_Result::pass();
 	}
 
 	/**
@@ -163,19 +163,19 @@ class PreFlight_Checks_Content implements PreFlight_Check_Category {
 	 * an extra SQL query on sites with object caching enabled.
 	 *
 	 * @since 0.3.0
-	 * @return PreFlight_Check_Result
+	 * @return Prelaunch_Checker_Check_Result
 	 */
-	public function check_no_published_content(): PreFlight_Check_Result {
+	public function check_no_published_content(): Prelaunch_Checker_Check_Result {
 		$post_count = (int) wp_count_posts( 'post' )->publish;
 		$page_count = (int) wp_count_posts( 'page' )->publish;
 
 		if ( 0 === $post_count && 0 === $page_count ) {
-			return PreFlight_Check_Result::fail(
-				__( 'The site has no published posts or pages.', 'preflight-wp' ),
-				__( 'Publish at least one page (e.g. a homepage) before launch.', 'preflight-wp' )
+			return Prelaunch_Checker_Check_Result::fail(
+				__( 'The site has no published posts or pages.', 'prelaunch-checker' ),
+				__( 'Publish at least one page (e.g. a homepage) before launch.', 'prelaunch-checker' )
 			);
 		}
-		return PreFlight_Check_Result::pass();
+		return Prelaunch_Checker_Check_Result::pass();
 	}
 
 	/**
@@ -190,9 +190,9 @@ class PreFlight_Checks_Content implements PreFlight_Check_Category {
 	 * cross-post-type query that would require a UNION or post__in workaround.
 	 *
 	 * @since 0.3.0
-	 * @return PreFlight_Check_Result
+	 * @return Prelaunch_Checker_Check_Result
 	 */
-	public function check_sample_content_present(): PreFlight_Check_Result {
+	public function check_sample_content_present(): Prelaunch_Checker_Check_Result {
 		$found_items = array();
 
 		$hello_posts = get_posts(
@@ -206,7 +206,7 @@ class PreFlight_Checks_Content implements PreFlight_Check_Category {
 			)
 		);
 		if ( ! empty( $hello_posts ) ) {
-			$found_items[] = __( '"Hello world!" post', 'preflight-wp' );
+			$found_items[] = __( '"Hello world!" post', 'prelaunch-checker' );
 		}
 
 		$sample_pages = get_posts(
@@ -220,26 +220,26 @@ class PreFlight_Checks_Content implements PreFlight_Check_Category {
 			)
 		);
 		if ( ! empty( $sample_pages ) ) {
-			$found_items[] = __( '"Sample Page" page', 'preflight-wp' );
+			$found_items[] = __( '"Sample Page" page', 'prelaunch-checker' );
 		}
 
 		if ( ! empty( $found_items ) ) {
-			return PreFlight_Check_Result::fail(
+			return Prelaunch_Checker_Check_Result::fail(
 				sprintf(
 					/* translators: %s: comma-separated list of found sample content items */
-					__( 'Default WordPress sample content is still published: %s.', 'preflight-wp' ),
-					implode( _x( ', ', 'list separator', 'preflight-wp' ), $found_items )
+					__( 'Default WordPress sample content is still published: %s.', 'prelaunch-checker' ),
+					implode( _x( ', ', 'list separator', 'prelaunch-checker' ), $found_items )
 				),
-				__( 'Delete or unpublish the sample post and/or sample page before launch.', 'preflight-wp' )
+				__( 'Delete or unpublish the sample post and/or sample page before launch.', 'prelaunch-checker' )
 			);
 		}
-		return PreFlight_Check_Result::pass();
+		return Prelaunch_Checker_Check_Result::pass();
 	}
 }
 
 add_action(
-	'preflight_register_categories',
-	static function ( PreFlight_Core $core ): void {
-		$core->register_category( new PreFlight_Checks_Content() );
+	'prelaunch_checker_register_categories',
+	static function ( Prelaunch_Checker_Core $core ): void {
+		$core->register_category( new Prelaunch_Checker_Checks_Content() );
 	}
 );
